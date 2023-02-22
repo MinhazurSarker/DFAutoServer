@@ -1,0 +1,114 @@
+const User = require('../model/User');
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+const bcrypt = require("bcrypt");
+dotenv.config();
+
+const jwt_secret = process.env.JWT_SECRET || '';
+const createUser = async (req, res) => {
+    const roles = ['admin', 'editor', 'viewer'];
+    try {
+        const u = await User.findOne({ email: req.body.email })
+        if (!u) {
+            const hashPassword = await bcrypt.hash(req.body.password, 10);
+            const user = await new User({
+                name: req.body.name,
+                email: req.body.email,
+                role: roles.includes(req.body.role) ? req.body.role : 'viewer',
+                password: hashPassword
+            })
+            user.save()
+            res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+        } else {
+
+            res.status(403).json({ msg: 'userAlreadyExists' })
+        }
+    } catch (error) {
+        res.status(500).json({ err: 'something went wrong' })
+    }
+}
+const login = async (req, res) => {
+    console.log(req.body)
+    try {
+        const user = await User.findOne({
+            email: req.body.email,
+        })
+        if (user) {
+            const isValid = await bcrypt.compare(req.body.password, user.password)
+            if (isValid) {
+                const payload = {
+                    userId: user._id,
+                };
+                const token = jwt.sign(payload, jwt_secret, {
+                    expiresIn: 60 * 60 * 24 * 30 * 6,
+                });
+                res.status(200).json({ msg: 'success', token: token, user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+            } else {
+                res.status(401).json({ msg: 'invalid' })
+            }
+        } else {
+            res.status(404).json({ err: 'notFound' })
+
+        }
+    } catch (error) {
+        res.status(500).json({ err: 'something went wrong' })
+    }
+}
+
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find().select('_id email role ');
+        res.status(200).json({ msg: 'success', users: users })
+    } catch (err) {
+        res.status(400).json({ err: 'something went wrong' })
+
+    }
+}
+const getUser = async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.params.userId })
+        if (user) {
+            res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+        } else {
+            res.status(404).json({ msg: 'notFound', })
+        }
+    } catch (err) {
+        res.status(400).json({ err: err })
+    }
+}
+const updateUser = async (req, res) => {
+    try {
+        const hashPassword = await bcrypt.hash(req.body.password, 10);
+        const user = await User.findOne({ _id: req.params.userId })
+        if (user) {
+            user.name = req.body.name;
+            user.email = req.body.email;
+            user.role = req.body.role;
+            user.password = hashPassword
+            user.save()
+            res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+        } else {
+            res.status(404).json({ msg: 'notFound', })
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ err: err })
+    }
+}
+const deleteUser = async (req, res) => {
+    try {
+        await User.deleteOne({ _id: req.params.userId });
+        res.status(200).json({ msg: 'success' })
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ err: err })
+    }
+}
+module.exports = {
+    createUser,
+    login,
+    getUsers,
+    getUser,
+    updateUser,
+    deleteUser,
+}
