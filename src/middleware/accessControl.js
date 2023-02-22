@@ -14,6 +14,12 @@ const isViewer = async (req, res, next) => {
             const user = await User.findOne({ _id: id })
             if (user) {
                 if (['admin', 'editor', 'viewer'].includes(user.role)) {
+                    req.body.requesterId = user._id;
+                    req.body.requesterRole = user.role;
+                    req.params.requesterId = user._id;
+                    req.params.requesterRole = user.role;
+                    req.query.requesterId = user._id;
+                    req.query.requesterRole = user.role;
                     next()
                 } else {
                     res.status(403).json({ msg: 'Unauthorized' })
@@ -38,6 +44,12 @@ const isEditor = async (req, res, next) => {
             const user = await User.findOne({ _id: id })
             if (user) {
                 if (['admin', 'editor'].includes(user.role)) {
+                    req.body.requesterId = user._id;
+                    req.body.requesterRole = user.role;
+                    req.params.requesterId = user._id;
+                    req.params.requesterRole = user.role;
+                    req.query.requesterId = user._id;
+                    req.query.requesterRole = user.role;
                     next()
                 } else {
                     res.status(403).json({ msg: 'Unauthorized' })
@@ -62,6 +74,12 @@ const isAdmin = async (req, res, next) => {
             const user = await User.findOne({ _id: id })
             if (user) {
                 if (['admin'].includes(user.role)) {
+                    req.body.requesterId = user._id;
+                    req.body.requesterRole = user.role;
+                    req.params.requesterId = user._id;
+                    req.params.requesterRole = user.role;
+                    req.query.requesterId = user._id;
+                    req.query.requesterRole = user.role;
                     next()
                 } else {
                     res.status(403).json({ msg: 'Unauthorized' })
