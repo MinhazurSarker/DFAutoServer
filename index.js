@@ -42,9 +42,9 @@ app.get('/', (req, res) => {
     res.status(200).json({ msg: 'OK' });
 })
 app.use('/api/', require('./src/route/api'))
-// app.get("/*", (req, res) => {
-//     res.status(404).send({ msg: '404' });
-// });
+app.get("/*", (req, res) => {
+    res.status(404).send();
+});
 
 
 app.listen(5000, () => {

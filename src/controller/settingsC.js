@@ -1,7 +1,6 @@
 const Setting = require('../model/Setting')
 
 const getSettings = async (req, res) => {
-    console.log(req.body)
     try {
         const settingsDocument = await Setting.findOne();
         if (!settingsDocument) {
