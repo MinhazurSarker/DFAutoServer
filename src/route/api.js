@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, login, updateUser, deleteUser, getUser, getUsers } = require('../controller/userC');
+const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin } = require('../controller/userC');
 const { getSettings, updateSettings, } = require('../controller/settingsC');
 const { isAdmin } = require('../middleware/accessControl');
 const { imgUpload } = require('../middleware/file');
@@ -9,6 +9,7 @@ const router = express();
 router.get('/', function (req, res) {
     res.send('ok')
 })
+router.post('/init', createAdmin)
 router.post('/login', login)
 //----------------------------------------------------------------
 router.get('/users', isAdmin, getUsers)

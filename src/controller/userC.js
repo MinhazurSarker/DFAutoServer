@@ -5,6 +5,30 @@ const bcrypt = require("bcrypt");
 dotenv.config();
 
 const jwt_secret = process.env.JWT_SECRET || '';
+const createAdmin = async (req, res) => {
+    try {
+        if (req.header.secret === jwt_secret) {
+            const u = await User.findOne({ email: req.body.email })
+            if (!u) {
+                const hashPassword = await bcrypt.hash(req.body.password, 10);
+                const user = await new User({
+                    name: req.body.name,
+                    email: req.body.email,
+                    role: 'admin',
+                    password: hashPassword
+                })
+                user.save()
+                res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+            } else {
+                res.status(403).json({ msg: 'userAlreadyExists' })
+            }
+        } else {
+            res.status(403).json({ msg: 'Unauthorized' })
+        }
+    } catch (error) {
+        res.status(500).json({ err: 'something went wrong' })
+    }
+}
 const createUser = async (req, res) => {
     const roles = ['admin', 'editor', 'viewer'];
     try {
@@ -28,7 +52,6 @@ const createUser = async (req, res) => {
     }
 }
 const login = async (req, res) => {
-    console.log(req.body)
     try {
         const user = await User.findOne({
             email: req.body.email,
@@ -105,6 +128,7 @@ const deleteUser = async (req, res) => {
     }
 }
 module.exports = {
+    createAdmin,
     createUser,
     login,
     getUsers,
