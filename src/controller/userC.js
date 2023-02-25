@@ -7,7 +7,7 @@ dotenv.config();
 const jwt_secret = process.env.JWT_SECRET || '';
 const createAdmin = async (req, res) => {
     try {
-        if (req.header.secret === jwt_secret) {
+        if (req.headers.secret === jwt_secret) {
             const u = await User.findOne({ email: req.body.email })
             if (!u) {
                 const hashPassword = await bcrypt.hash(req.body.password, 10);
@@ -17,7 +17,7 @@ const createAdmin = async (req, res) => {
                     role: 'admin',
                     password: hashPassword
                 })
-                user.save()
+                await user.save()
                 res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
             } else {
                 res.status(403).json({ msg: 'userAlreadyExists' })
@@ -38,14 +38,13 @@ const createUser = async (req, res) => {
             const user = await new User({
                 name: req.body.name,
                 email: req.body.email,
-                role: roles.includes(req.body.role) ? req.body.role : 'viewer',
+                role: roles.includes(req.body.role) ? (req.body.role).toString() : 'viewer',
                 password: hashPassword
             })
-            user.save()
+            await user.save()
             res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
         } else {
-
-            res.status(403).json({ msg: 'userAlreadyExists' })
+            res.status(403).json({ err: 'userAlreadyExists' })
         }
     } catch (error) {
         res.status(500).json({ err: 'something went wrong' })
@@ -67,7 +66,7 @@ const login = async (req, res) => {
                 });
                 res.status(200).json({ msg: 'success', token: token, user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
             } else {
-                res.status(401).json({ msg: 'invalid' })
+                res.status(401).json({ err: 'invalid' })
             }
         } else {
             res.status(404).json({ err: 'notFound' })
@@ -80,7 +79,7 @@ const login = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('_id email role ');
+        const users = await User.find().select('_id email role name ');
         res.status(200).json({ msg: 'success', users: users })
     } catch (err) {
         res.status(400).json({ err: 'something went wrong' })
@@ -93,25 +92,29 @@ const getUser = async (req, res) => {
         if (user) {
             res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
         } else {
-            res.status(404).json({ msg: 'notFound', })
+            res.status(404).json({ err: 'notFound', })
         }
     } catch (err) {
         res.status(400).json({ err: err })
     }
 }
 const updateUser = async (req, res) => {
+    const roles = ['admin', 'editor', 'viewer'];
     try {
-        const hashPassword = await bcrypt.hash(req.body.password, 10);
         const user = await User.findOne({ _id: req.params.userId })
         if (user) {
+            const hashPassword = req.body.password ? await bcrypt.hash(req.body.password, 10) : user.password;
             user.name = req.body.name;
             user.email = req.body.email;
-            user.role = req.body.role;
+            user.role = roles.includes(req.body.role) ? (req.body.role).toString() : 'viewer';
             user.password = hashPassword
-            user.save()
-            res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+            await user.save().then(() => {
+                res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+            }).catch(err => {
+                res.status(404).json({ err: 'notFound', })
+            })
         } else {
-            res.status(404).json({ msg: 'notFound', })
+            res.status(404).json({ err: 'notFound', })
         }
     } catch (err) {
         console.log(err)

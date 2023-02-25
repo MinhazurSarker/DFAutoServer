@@ -33,7 +33,6 @@ const imgUpload = multer({
             file.mimetype == "image/jpg" ||
             file.mimetype == "image/jpeg"
         ) {
-            console.log(req.body)
             cb(null, true);
         } else {
             cb(null, false);

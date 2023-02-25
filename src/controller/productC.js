@@ -6,10 +6,13 @@ const createProduct = async (req, res) => {
     try {
         const product = await new Product({
             name: req.body.name,
-            weight: Number(req.body.weight),
-            pt: Number(req.body.pt),
-            pd: Number(req.body.pd),
-            rh: Number(req.body.rh),
+            type: req.body.type,
+            brand: req.body.brand,
+            serial: req.body.serial,
+            weight: Number(req.body.weight) || 0,
+            pt: Number(req.body.pt) || 0,
+            pd: Number(req.body.pd) || 0,
+            rh: Number(req.body.rh) || 0,
             img: files,
         })
         await product.save()
@@ -70,7 +73,6 @@ const getProducts = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ err: 'error' })
     }
 }
@@ -94,10 +96,13 @@ const updateProduct = async (req, res) => {
         const product = await Product.findOne({ _id: req.params.productId })
         if (product) {
             product.name = req.body.name;
-            product.weight = Number(req.body.weight);
-            product.pt = Number(req.body.pt);
-            product.pd = Number(req.body.pd);
-            product.rh = Number(req.body.rh);
+            product.type = req.body.type;
+            product.brand = req.body.brand;
+            product.serial = req.body.serial;
+            product.weight = Number(req.body.weight) || 0;
+            product.pt = Number(req.body.pt) || 0;
+            product.pd = Number(req.body.pd) || 0;
+            product.rh = Number(req.body.rh) || 0;
             product.img = product.img.concat(files);
             product.img = product.img.filter((item) => !remove.includes(item));
             await product.save()

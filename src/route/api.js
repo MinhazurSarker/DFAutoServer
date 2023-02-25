@@ -1,7 +1,7 @@
 const express = require('express');
 const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin } = require('../controller/userC');
 const { getSettings, updateSettings, } = require('../controller/settingsC');
-const { isAdmin } = require('../middleware/accessControl');
+const { isAdmin, isEditor, isViewer } = require('../middleware/accessControl');
 const { imgUpload } = require('../middleware/file');
 
 const { createProduct, updateProduct, getProducts, getProduct, deleteProduct } = require('../controller/productC');
@@ -21,10 +21,10 @@ router.delete('/user/:userId', isAdmin, deleteUser)
 router.get('/settings', isAdmin, getSettings)
 router.post('/settings', isAdmin, updateSettings)
 //----------------------------------------------------------------
-router.get('/products', isAdmin, imgUpload, getProducts)
-router.get('/product/:productId', isAdmin, imgUpload, getProduct)
-router.post('/products', isAdmin, imgUpload, createProduct)
-router.post('/product/:productId', isAdmin, imgUpload, updateProduct)
-router.delete('/product/:productId', isAdmin, imgUpload, deleteProduct)
+router.get('/products', isViewer, imgUpload, getProducts)
+router.get('/product/:productId', isViewer, imgUpload, getProduct)
+router.post('/products', isEditor, imgUpload, createProduct)
+router.post('/product/:productId', isEditor, imgUpload, updateProduct)
+router.delete('/product/:productId', isEditor, imgUpload, deleteProduct)
 
 module.exports = router;
