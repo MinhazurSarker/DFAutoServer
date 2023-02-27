@@ -25,20 +25,20 @@ const updateSettings = async (req, res) => {
         if (!settingsDocument) {
             const defaultSettings = {
                 id: 1,
-                ptPrice: req.body.ptPrice,
-                pdPrice: req.body.pdPrice,
-                rhPrice: req.body.rhPrice,
-                usdToAed: req.body.usdToAed,
-                gbpToAed: req.body.gbpToAed,
+                ptPrice: Number(req.body.ptPrice) || 0,
+                pdPrice: Number(req.body.pdPrice) || 0,
+                rhPrice: Number(req.body.rhPrice) || 0,
+                usdToAed: Number(req.body.usdToAed) || 0,
+                gbpToAed: Number(req.body.gbpToAed) || 0,
             };
             await Setting.create(defaultSettings);
         } else {
             settingsDocument.id = 1;
-            settingsDocument.ptPrice = req.body.ptPrice;
-            settingsDocument.pdPrice = req.body.pdPrice;
-            settingsDocument.rhPrice = req.body.rhPrice;
-            settingsDocument.usdToAed = req.body.usdToAed;
-            settingsDocument.gbpToAed = req.body.gbpToAed;
+            settingsDocument.ptPrice = Number(req.body.ptPrice) || 0;
+            settingsDocument.pdPrice = Number(req.body.pdPrice) || 0;
+            settingsDocument.rhPrice = Number(req.body.rhPrice) || 0;
+            settingsDocument.usdToAed = Number(req.body.usdToAed) || 0;
+            settingsDocument.gbpToAed = Number(req.body.gbpToAed) || 0;
             await settingsDocument.save()
         }
         const settings = await Setting.findOne();
