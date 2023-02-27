@@ -1,6 +1,6 @@
 const Product = require('../model/Product')
-const fs = require("fs");
 const Setting = require('../model/Setting')
+const fs = require("fs");
 const createProduct = async (req, res) => {
     const files = req.files.map((file) => file.path.replace("public", "").split("\\").join("/"));
     try {
@@ -142,7 +142,6 @@ const deleteProduct = async (req, res) => {
         res.status(500).json({ err: 'error' })
     }
 }
-
 module.exports = {
     createProduct,
     getProducts,

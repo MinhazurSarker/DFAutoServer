@@ -3,7 +3,6 @@ const User = require('./../model/User');
 const dotenv = require("dotenv");
 dotenv.config();
 const jwt_secret = process.env.JWT_SECRET || '';
-
 const isViewer = async (req, res, next) => {
     const token = req.headers.token || req.cookies.token || req.query.token;
     try {

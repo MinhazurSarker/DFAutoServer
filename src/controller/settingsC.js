@@ -1,5 +1,4 @@
 const Setting = require('../model/Setting')
-
 const getSettings = async (req, res) => {
     try {
         const settingsDocument = await Setting.findOne();
@@ -48,7 +47,6 @@ const updateSettings = async (req, res) => {
         res.status(500).json({ err: 'error', });
     }
 }
-
 module.exports = {
     getSettings,
     updateSettings,
