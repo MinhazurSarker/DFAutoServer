@@ -1,10 +1,10 @@
 const express = require('express');
-const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin } = require('../controller/userC');
-const { getSettings, updateSettings, } = require('../controller/settingsC');
-const { isAdmin, isEditor, isViewer } = require('../middleware/accessControl');
-const { imgUpload } = require('../middleware/file');
+const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin } = require('./../controller/userC');
+const { getSettings, updateSettings, } = require('./../controller/settingsC');
+const { isAdmin, isEditor, isViewer } = require('./../middleware/accessControl');
+const { imgUpload } = require('./../middleware/file');
 
-const { createProduct, updateProduct, getProducts, getProduct, deleteProduct } = require('../controller/productC');
+const { createProduct, updateProduct, getProducts, getProduct, deleteProduct } = require('./../controller/productC');
 const router = express();
 router.get('/', function (req, res) {
     res.send('ok')
