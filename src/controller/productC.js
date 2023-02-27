@@ -1,5 +1,5 @@
-const Product = require('./../model/Product')
-const Setting = require('./../model/Setting')
+const Product = require('./../model/Product.js')
+const Setting = require('./../model/Setting.js')
 const fs = require("fs");
 const createProduct = async (req, res) => {
     const files = req.files.map((file) => file.path.replace("public", "").split("\\").join("/"));

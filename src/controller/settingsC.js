@@ -1,4 +1,4 @@
-const Setting = require('./../model/Setting')
+const Setting = require('./../model/Setting.js')
 const getSettings = async (req, res) => {
     try {
         const settingsDocument = await Setting.findOne();
