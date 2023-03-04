@@ -1,11 +1,12 @@
 const express = require('express');
 const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin } = require('./../controller/userC.js');
-const { getSettings, updateSettings, } = require('./../controller/settingsC.js');
+const { getSettings, updateSettings, getIndex, } = require('./../controller/settingsC.js');
+const { createProduct, updateProduct, getProducts, getProduct, deleteProduct } = require('./../controller/productC.js');
 const { isAdmin, isEditor, isViewer } = require('./../middleware/accessControl.js');
 const { imgUpload } = require('./../middleware/file.js');
 
-const { createProduct, updateProduct, getProducts, getProduct, deleteProduct } = require('./../controller/productC.js');
 const router = express();
+
 router.get('/', function (req, res) {
     res.send('ok')
 })
@@ -21,10 +22,11 @@ router.delete('/user/:userId', isAdmin, deleteUser)
 router.get('/settings', isAdmin, getSettings)
 router.post('/settings', isAdmin, updateSettings)
 //----------------------------------------------------------------
-router.get('/products', isViewer, imgUpload, getProducts)
-router.get('/product/:productId', isViewer, imgUpload, getProduct)
+router.get('/home', isViewer, getIndex)
+router.get('/products', isViewer, getProducts)
+router.get('/product/:productId', isViewer, getProduct)
 router.post('/products', isEditor, imgUpload, createProduct)
 router.post('/product/:productId', isEditor, imgUpload, updateProduct)
-router.delete('/product/:productId', isEditor, imgUpload, deleteProduct)
+router.delete('/product/:productId', isEditor, deleteProduct)
 
 module.exports = router;
