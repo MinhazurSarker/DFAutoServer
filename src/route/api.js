@@ -27,6 +27,6 @@ router.get('/products', isViewer, getProducts)
 router.get('/product/:productId', isViewer, getProduct)
 router.post('/products', isEditor, imgUpload, createProduct)
 router.post('/product/:productId', isEditor, imgUpload, updateProduct)
-router.delete('/product/:productId', isEditor, deleteProduct)
+router.delete('/product/:productId', isAdmin, deleteProduct)
 
 module.exports = router;
