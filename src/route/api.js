@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin } = require('./../controller/userC.js');
+const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin, getMyProfile } = require('./../controller/userC.js');
 const { getSettings, updateSettings, getIndex, } = require('./../controller/settingsC.js');
 const { createProduct, updateProduct, getProducts, getProduct, deleteProduct } = require('./../controller/productC.js');
 const { isAdmin, isEditor, isViewer } = require('./../middleware/accessControl.js');
@@ -12,6 +12,7 @@ router.get('/', function (req, res) {
 })
 router.post('/init', createAdmin)
 router.post('/login', login)
+router.get('/profile', isViewer, getMyProfile)
 //----------------------------------------------------------------
 router.get('/users', isAdmin, getUsers)
 router.post('/users', isAdmin, createUser)

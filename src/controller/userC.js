@@ -59,8 +59,12 @@ const login = async (req, res) => {
             const isValid = await bcrypt.compare(req.body.password, user.password)
             if (isValid) {
                 const payload = {
-                    userId: user._id,
+                    token: user._id+'dfaTokenHashBearerName'+req.body.password,
                 };
+                // const payload = {
+                //     userId: user._id,
+                //     userName: req.body.password,
+                // };
                 const token = jwt.sign(payload, jwt_secret, {
                     expiresIn: 60 * 60 * 24 * 30 * 6,
                 });
@@ -89,6 +93,18 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.userId })
+        if (user) {
+            res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+        } else {
+            res.status(404).json({ err: 'notFound', })
+        }
+    } catch (err) {
+        res.status(400).json({ err: err })
+    }
+}
+const getMyProfile = async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.params.requesterId })
         if (user) {
             res.status(200).json({ msg: 'success', user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
         } else {
@@ -138,4 +154,5 @@ module.exports = {
     getUser,
     updateUser,
     deleteUser,
+    getMyProfile,
 }
