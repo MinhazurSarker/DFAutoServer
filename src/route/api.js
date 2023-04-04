@@ -2,7 +2,7 @@ const express = require('express');
 const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin, getMyProfile } = require('./../controller/userC.js');
 const { getSettings, updateSettings, getIndex, } = require('./../controller/settingsC.js');
 const { createProduct, updateProduct, getProducts, getProduct, deleteProduct } = require('./../controller/productC.js');
-const { isAdmin, isEditor, isViewer } = require('./../middleware/accessControl.js');
+const { isAdmin, isEditor, isViewer, isApproved } = require('./../middleware/accessControl.js');
 const { imgUpload } = require('./../middleware/file.js');
 
 const router = express();
@@ -25,6 +25,7 @@ router.post('/settings', isAdmin, updateSettings)
 //----------------------------------------------------------------
 router.get('/home', isViewer, getIndex)
 router.get('/products', isViewer, getProducts)
+router.get('/borrow/products', isApproved, getProducts)
 router.get('/product/:productId', isViewer, getProduct)
 router.post('/products', isEditor, imgUpload, createProduct)
 router.post('/product/:productId', isEditor, imgUpload, updateProduct)

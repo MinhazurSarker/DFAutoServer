@@ -134,8 +134,25 @@ const isAdmin = async (req, res, next) => {
         res.status(500).json({ err: err.message });
     }
 }
+const isApproved = async (req, res, next) => {
+    const token = req.headers.token || req.cookies.token || req.query.token;
+    try {
+        if (token) {
+            if (token == jwt_secret) {
+                next()
+            } else {
+                res.status(403).json({ msg: 'Invalid token' })
+            }
+        } else {
+            res.status(403).json({ err: 'Need To Login' })
+        }
+    } catch (err) {
+        res.status(500).json({ err: err.message });
+    }
+}
 module.exports = {
     isViewer,
     isEditor,
     isAdmin,
+    isApproved
 }
