@@ -53,6 +53,7 @@ const getProducts = async (req, res) => {
                 $limit: 100
             },
         ]);
+        
         const totalDocs = await Product.countDocuments(match);
         const pages = Math.ceil(totalDocs / 100)
         if (products) {
