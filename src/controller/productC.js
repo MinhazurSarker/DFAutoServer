@@ -44,7 +44,7 @@ const getProducts = async (req, res) => {
                 }
             },
             {
-                $sort: { createdAt: -1 }
+                $sort: { createdAt: -1, _id: -1 }
             },
             {
                 $skip: (page - 1) * 100
