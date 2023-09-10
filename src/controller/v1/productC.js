@@ -74,14 +74,14 @@ const getProducts = async (req, res) => {
                 lastPage: page * 100 >= totalDocs ? true : false,
                 pages: pages,
                 current: page,
-                settings: {
-                    ptPrice: settings?.ptPrice,
-                    pdPrice: settings?.pdPrice,
-                    rhPrice: settings?.rhPrice,
-                    gbpToAED: await findMyRate("AED", "GBP"),
-                    usdToAED: await findMyRate("AED", "USD"),
-
-                },
+                settings: settings,
+                // settings: {
+                //     ptPrice: settings?.ptPrice,
+                //     pdPrice: settings?.pdPrice,
+                //     rhPrice: settings?.rhPrice,
+                //     gbpToAED: await findMyRate("AED", "GBP"),
+                //     usdToAED: await findMyRate("AED", "USD"),
+                // },
             });
         } else {
             res.status(400).send({
@@ -89,13 +89,14 @@ const getProducts = async (req, res) => {
                 lastPage: true,
                 pages: 1,
                 current: 1,
-                settings: {
-                    ptPrice: settings?.ptPrice,
-                    pdPrice: settings?.pdPrice,
-                    rhPrice: settings?.rhPrice,
-                    gbpToAED: await findMyRate("AED", "GBP"),
-                    usdToAED: await findMyRate("AED", "USD"),
-                },
+                settings: settings,
+                // settings: {
+                //     ptPrice: settings?.ptPrice,
+                //     pdPrice: settings?.pdPrice,
+                //     rhPrice: settings?.rhPrice,
+                //     gbpToAED: await findMyRate("AED", "GBP"),
+                //     usdToAED: await findMyRate("AED", "USD"),
+                // },
             });
         }
     } catch (error) {
