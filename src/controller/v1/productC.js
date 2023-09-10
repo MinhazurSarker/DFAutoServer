@@ -25,19 +25,10 @@ const createProduct = async (req, res) => {
 }
 const getProducts = async (req, res) => {
     const page = req.query.page || 1;
-    const search = req.query.search || null;
-    const carBrand = req.query.brand || null;
-    const carModel = req.query.carModel || null;
-    const match = (carBrand && carModel && search) ? {
+    const search = req.query.search || '';
+    const match = {
         name: { $regex: search, $options: "i" },
-        carBrand: carBrand,
-        carModel: carModel,
-    } : (carBrand && search) ? {
-        name: { $regex: search, $options: "i" },
-        carBrand: carBrand,
-    } : (search) ? {
-        name: { $regex: search, $options: "i" },
-    } : {}
+    }
     try {
         const settings = await Setting.findOne()
         const products = await Product.aggregate([
@@ -108,7 +99,6 @@ const updateProduct = async (req, res) => {
         const product = await Product.findOne({ _id: req.params.productId })
         if (product) {
             product.name = req.body.name;
-            product.type = req.body.type;
             product.brand = req.body.brand;
             product.serial = req.body.serial;
             product.weight = Number(req.body.weight) || 0;

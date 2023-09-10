@@ -2,7 +2,7 @@ const express = require('express');
 const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin, getMyProfile } = require('./../controller/v1/userC.js');
 const { getSettings, updateSettings, getIndex, } = require('./../controller/v1/settingsC.js');
 const { createProduct, updateProduct, getProducts, getProduct, deleteProduct } = require('./../controller/v1/productC.js');
-const { isAdmin, isEditor, isViewer, isApproved } = require('./../middleware/accessControl.js');
+const { isAdmin, isEditor, isViewer, isApproved } = require('./../middleware/accessControlOld.js');
 const { imgUpload } = require('./../middleware/file.js');
 
 const router = express();

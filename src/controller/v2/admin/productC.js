@@ -280,27 +280,27 @@ const restoreProduct = async (req, res) => {
         res.status(500).json({ err: 'error' })
     }
 }
-// const deleteProduct = async (req, res) => {
-//     try {
-//         const product = await Product.findOne({ _id: req.params.productId })
-//         if (product) {
+const deleteProduct2 = async (req, res) => {
+    try {
+        const product = await Product.findOne({ _id: req.params.productId })
+        if (product) {
 
-//             product.img.map(
-//                 (item) => {
-//                     fs.unlink("./public" + item, (err) => {
-//                         console.log(err);
-//                     })
-//                 }
-//             )
-//             await Product.deleteOne({ _id: req.params.productId })
-//             res.status(200).json({ msg: 'success' })
-//         } else {
-//             res.status(404).json({ err: 'notFound', })
-//         }
-//     } catch (error) {
-//         res.status(500).json({ err: 'error' })
-//     }
-// }
+            product.img.map(
+                (item) => {
+                    fs.unlink("./public" + item, (err) => {
+                        console.log(err);
+                    })
+                }
+            )
+            await Product.deleteOne({ _id: req.params.productId })
+            res.status(200).json({ msg: 'success' })
+        } else {
+            res.status(404).json({ err: 'notFound', })
+        }
+    } catch (error) {
+        res.status(500).json({ err: 'error' })
+    }
+}
 module.exports = {
     createProduct,
     getProducts,
