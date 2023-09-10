@@ -1,3 +1,4 @@
+const ExchangeRate = require('../../model/ExchangeRate.js');
 const Product = require('./../../model/Product.js')
 const Setting = require('./../../model/Setting.js')
 const fs = require("fs");
@@ -25,7 +26,8 @@ const createProduct = async (req, res) => {
 }
 const getProducts = async (req, res) => {
     const page = req.query.page || 1;
-    const search = req.query.search || '';
+    const searchString = req.query.search || '';
+    const search = searchString.replace(/\s+/g, '')
     const match = {
         name: { $regex: search, $options: "i" },
     }
@@ -58,13 +60,28 @@ const getProducts = async (req, res) => {
 
         const totalDocs = await Product.countDocuments(match);
         const pages = Math.ceil(totalDocs / 100)
+        const findMyRate = async (currencyCode, base) => {
+            const exchangeRate = await ExchangeRate.findOne({ base: base, }).sort({ createdAt: -1 }).exec();
+            if (exchangeRate && exchangeRate?.rates && exchangeRate?.rates.hasOwnProperty(currencyCode)) {
+                return exchangeRate.rates[currencyCode];
+            } else {
+                return 0;
+            }
+        }
         if (products) {
             res.status(200).send({
                 products: products,
                 lastPage: page * 100 >= totalDocs ? true : false,
                 pages: pages,
                 current: page,
-                settings: settings,
+                settings: {
+                    ptPrice: settings?.ptPrice,
+                    pdPrice: settings?.pdPrice,
+                    rhPrice: settings?.rhPrice,
+                    gbpToAED: await findMyRate("AED", "GBP"),
+                    usdToAED: await findMyRate("AED", "USD"),
+
+                },
             });
         } else {
             res.status(400).send({
@@ -72,7 +89,13 @@ const getProducts = async (req, res) => {
                 lastPage: true,
                 pages: 1,
                 current: 1,
-                settings: settings,
+                settings: {
+                    ptPrice: settings?.ptPrice,
+                    pdPrice: settings?.pdPrice,
+                    rhPrice: settings?.rhPrice,
+                    gbpToAED: await findMyRate("AED", "GBP"),
+                    usdToAED: await findMyRate("AED", "USD"),
+                },
             });
         }
     } catch (error) {

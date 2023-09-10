@@ -2,6 +2,7 @@ const User = require('./../../model/User.js');
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const bcrypt = require("bcrypt");
+const { reverseString } = require('../../utils/utils.js');
 dotenv.config();
 
 const jwt_secret = process.env.JWT_SECRET || '';
@@ -59,7 +60,7 @@ const login = async (req, res) => {
             const isValid = await bcrypt.compare(req.body.password, user.password)
             if (isValid) {
                 const payload = {
-                    token: user._id+'dfaTokenHashBearerName'+req.body.password,
+                    token: user._id + 'dfaTokenHashBearerName' + req.body.password,
                 };
                 // const payload = {
                 //     userId: user._id,
@@ -68,7 +69,7 @@ const login = async (req, res) => {
                 const token = jwt.sign(payload, jwt_secret, {
                     expiresIn: 60 * 60 * 24 * 30 * 6,
                 });
-                res.status(200).json({ msg: 'success', token: token, user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
+                res.status(200).json({ msg: 'success', token: reverseString(token), user: { name: user.name, role: user.role, email: user.email, _id: user._id } })
             } else {
                 res.status(401).json({ err: 'invalid' })
             }
