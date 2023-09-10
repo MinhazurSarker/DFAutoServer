@@ -176,7 +176,7 @@ const isAdmin = async (req, res, next) => {
 }
 const isApproved = async (req, res, next) => {
     const t = req.headers.token || req.cookies.token || req.query.token;
-    const token = reverseString(t)
+    const token = t
     try {
         if (token) {
             if (token == jwt_secret) {
