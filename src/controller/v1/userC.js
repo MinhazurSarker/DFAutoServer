@@ -59,13 +59,11 @@ const login = async (req, res) => {
         if (user) {
             const isValid = await bcrypt.compare(req.body.password, user.password)
             if (isValid) {
+             
                 const payload = {
-                    token: user._id + 'dfaTokenHashBearerName' + req.body.password,
+                    userId: user._id,
+                    userName: req.body.password,
                 };
-                // const payload = {
-                //     userId: user._id,
-                //     userName: req.body.password,
-                // };
                 const token = jwt.sign(payload, jwt_secret, {
                     expiresIn: 60 * 60 * 24 * 30 * 6,
                 });

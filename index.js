@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 const dotenv = require("dotenv");
 dotenv.config();
 const bp = require("body-parser");
@@ -12,6 +13,7 @@ const corn = require("node-cron");
 const ExchangeRate = require('./src/model/ExchangeRate');
 const { default: moment } = require('moment');
 const User = require('./src/model/User');
+const Product = require('./src/model/Product');
 mongoose.set('strictQuery', false);
 
 const app = express();
@@ -85,6 +87,26 @@ corn.schedule("0 0 0 * * *", async () => {
     }).catch((error) => {
         console.log(error)
     })
+});
+corn.schedule("0 0 0 * * *", async () => {
+
+    try {
+        const products = await Product.find(
+            { deleted: true, deletedOn: { $lte: Date.now() } },
+        );
+        for (let index = 0; index < products.length; index++) {
+            products[index].img.map(
+                (item) => {
+                    fs.unlink("./public" + item, (err) => {
+                        console.log(err);
+                    })
+                }
+            )
+            await Product.deleteOne({ _id: products[index]._id })
+        }
+    } catch (error) {
+        console.log(error)
+    }
 });
 corn.schedule("0 0 0 * * *", async () => {
 
