@@ -7,6 +7,11 @@ dotenv.config();
 const bp = require("body-parser");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
+const { default: axios } = require('axios');
+const corn = require("node-cron");
+const ExchangeRate = require('./src/model/ExchangeRate');
+const { default: moment } = require('moment');
+const User = require('./src/model/User');
 mongoose.set('strictQuery', false);
 
 const app = express();
@@ -14,9 +19,9 @@ const corsOption = {
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
 };
-let URI = process.env.MONGODB_URI||'';
-let user = process.env.MONGODB_USER||'';
-let pass = process.env.MONGODB_PASS||'';
+let URI = process.env.MONGODB_URI || '';
+let user = process.env.MONGODB_USER || '';
+let pass = process.env.MONGODB_PASS || '';
 let Options = {
     user: user,
     pass: pass,
@@ -42,11 +47,56 @@ app.get('/', (req, res) => {
     res.status(200).json({ msg: 'OK' });
 })
 app.use('/api/', require('./src/route/api'))
+app.use('/api/v2/', require('./src/route/v2'))
+app.use('/api/admin/', require('./src/route/admin'))
 app.get("/*", (req, res) => {
     res.status(404).send();
 });
 
+const createNewExchangeRates = async (exchangeRateData, targetCurrency) => {
+    try {
+        const baseCurrencyRate = exchangeRateData.rates[targetCurrency];
+        if (baseCurrencyRate === undefined) {
+            console.log(`Exchange rate for ${targetCurrency} not found.`);
+            return null;
+        }
+        const convertedRates = Object.fromEntries(
+            Object.keys(exchangeRateData.rates).map(currency => [
+                currency,
+                exchangeRateData.rates[currency] / baseCurrencyRate
+            ])
+        );
+        const rate = await new ExchangeRate({
+            base: targetCurrency,
+            rates: convertedRates
+        })
+        rate.save()
+    } catch (error) {
+        console.log(error)
+    }
+}
+corn.schedule("0 0 0 * * *", async () => {
+    const key = process.env.EXC_API_KEY;
+    // const apiUrl = `https://openexchangerates.org/api/latest.json?app_id=${key}`;
+    const apiUrl = `http://api.exchangeratesapi.io/v1/latest?access_key=${key}`;
+    axios.get(apiUrl).then((response) => {
+        createNewExchangeRates(response.data, 'USD')
+        createNewExchangeRates(response.data, 'GBP')
+    }).catch((error) => {
+        console.log(error)
+    })
+});
+corn.schedule("0 0 0 * * *", async () => {
 
+    try {
+        await User.updateMany(
+            { infinity: { $ne: true }, subEnd: { $lte: Date.now() } },
+            { role: "user" }
+        );
+    } catch (error) {
+        console.log(error)
+    }
+});
 app.listen(5000, () => {
     console.log('listening on port number 5000')
 })

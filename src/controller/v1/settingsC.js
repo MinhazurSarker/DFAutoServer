@@ -1,6 +1,6 @@
-const Product = require('../model/Product.js');
-const User = require('../model/User.js');
-const Setting = require('./../model/Setting.js')
+const Product = require('../../model/Product.js');
+const User = require('../../model/User.js');
+const Setting = require('./../../model/Setting.js')
 const getIndex = async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();

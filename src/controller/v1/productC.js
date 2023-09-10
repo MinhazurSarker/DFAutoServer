@@ -1,5 +1,5 @@
-const Product = require('./../model/Product.js')
-const Setting = require('./../model/Setting.js')
+const Product = require('./../../model/Product.js')
+const Setting = require('./../../model/Setting.js')
 const fs = require("fs");
 const createProduct = async (req, res) => {
     const files = req.files.map((file) => file.path.replace("public", "").split("\\").join("/"));
@@ -8,6 +8,8 @@ const createProduct = async (req, res) => {
             name: req.body.name,
             type: req.body.type,
             brand: req.body.brand,
+            carBrand: req.body.carBrand,
+            carModel: req.body.carModel,
             serial: req.body.serial,
             weight: Number(req.body.weight) || 0,
             pt: Number(req.body.pt) || 0,
@@ -23,10 +25,19 @@ const createProduct = async (req, res) => {
 }
 const getProducts = async (req, res) => {
     const page = req.query.page || 1;
-    const search = req.query.search || '';
-    const match = {
-        name: { $regex: search, $options: "i" }
-    }
+    const search = req.query.search || null;
+    const carBrand = req.query.brand || null;
+    const carModel = req.query.carModel || null;
+    const match = (carBrand && carModel && search) ? {
+        name: { $regex: search, $options: "i" },
+        carBrand: carBrand,
+        carModel: carModel,
+    } : (carBrand && search) ? {
+        name: { $regex: search, $options: "i" },
+        carBrand: carBrand,
+    } : (search) ? {
+        name: { $regex: search, $options: "i" },
+    } : {}
     try {
         const settings = await Setting.findOne()
         const products = await Product.aggregate([
@@ -53,7 +64,7 @@ const getProducts = async (req, res) => {
                 $limit: 100
             },
         ]);
-        
+
         const totalDocs = await Product.countDocuments(match);
         const pages = Math.ceil(totalDocs / 100)
         if (products) {
