@@ -48,7 +48,7 @@ const login = async (req, res) => {
         const user = await User.findOne({
             email: req.body.email,
         })
-        console.log(req.body)
+        console.log(user)
         if (user) {
             const isValid = await bcrypt.compare(req.body.password, user.password)
             if (isValid) {
@@ -69,6 +69,7 @@ const login = async (req, res) => {
                 });
                 res.status(200).json({ msg: 'success', token: reverseString(token), user: { name: user.name, role: user.role, email: user.email, _id: user._id, currency: user.currency } })
             } else {
+                console.log(user)
                 res.status(401).json({ err: 'invalid' })
             }
         } else {
