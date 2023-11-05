@@ -80,21 +80,21 @@ const getProducts = async (req, res) => {
                 $sort: { createdAt: -1, _id: -1 }
             },
             {
-                $skip: (page - 1) * 200
+                $skip: (page - 1) * 50
             },
             {
-                $limit: 200
+                $limit: 50
             },
 
         ]);
 
 
         const totalDocs = await Product.countDocuments(match);
-        const pages = Math.ceil(totalDocs / 200)
+        const pages = Math.ceil(totalDocs / 50)
         if (products) {
             res.status(200).send({
                 products: products,
-                lastPage: page * 200 >= totalDocs ? true : false,
+                lastPage: page * 50 >= totalDocs ? true : false,
                 pages: pages,
                 current: page,
                 settings: {
