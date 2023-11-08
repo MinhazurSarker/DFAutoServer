@@ -6,6 +6,7 @@ const moment = require('moment');
 const getIndex = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.body.requesterId, role: req.body.requesterRole });
+        console.log(user)
         const settings = await Setting.findOne();
         const exchangeRateDocumentsGBP = await ExchangeRate.find({ base: "GBP" });
         const exchangeRateDocumentsUSD = await ExchangeRate.find({ base: "USD" });
