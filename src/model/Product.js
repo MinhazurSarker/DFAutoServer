@@ -7,7 +7,7 @@ const ProductSchema = new mongoose.Schema(
             ref: "Brand",
         }],
         brand: { type: String, default: '-' },
-        material: { type: String, default: '-' },
+        material: { type: String, default: 'Ceramic' },
         continent: { type: String, default: '-' },
         country: { type: String, default: '-' },
         serial: { type: String, default: '-' },

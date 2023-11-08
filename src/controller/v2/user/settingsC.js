@@ -5,7 +5,7 @@ const ExchangeRate = require('./../../../model/ExchangeRate.js');
 const moment = require('moment');
 const getIndex = async (req, res) => {
     try {
-        const user = await User.findOne({ _id: req.body.requesterId, role: req.body.requesterRole });
+        const user = await User.findOne({ _id: req.body.requesterId });
         console.log(user)
         const settings = await Setting.findOne();
         const exchangeRateDocumentsGBP = await ExchangeRate.find({ base: "GBP" });
@@ -32,7 +32,7 @@ const getIndex = async (req, res) => {
                     };
                 }
             });
-            if (user && user._id) {
+            if (user && user.currency) {
                 const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user.currency || 'AED'] : 0);
                 const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user.currency || 'AED'] : 0);
                 const gbpMin = Math.min(...gbpRatesOnly);
