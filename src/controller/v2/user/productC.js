@@ -160,9 +160,13 @@ const getProducts = async (req, res) => {
         const user = await User.findOne({ _id: req.body.requesterId });
 
         const findMyRate = async (currencyCode, base) => {
-            // Your implementation here...
-        };
-
+            const exchangeRate = await ExchangeRate.findOne({ base: base, }).sort({ createdAt: -1 }).exec();
+            if (exchangeRate && exchangeRate?.rates && exchangeRate?.rates.hasOwnProperty(currencyCode)) {
+                return exchangeRate.rates[currencyCode];
+            } else {
+                return 0;
+            }
+        }
         const products = await Product.aggregate([
             {
                 $match: match

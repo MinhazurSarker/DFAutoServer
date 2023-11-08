@@ -31,41 +31,131 @@ const createProduct = async (req, res) => {
         res.status(500).json({ err: 'error' })
     }
 }
+// const getProducts = async (req, res) => {
+//     const page = req.query.page || 1;
+//     const searchString = req.query.search || '';
+//     const carBrand = req.query.brand || null;
+//     const search = searchString
+//     const match = ((carBrand) ? {
+//         $or: [
+//             { name: { $regex: search, $options: "i" } },
+//             { serial: { $regex: search, $options: "i" } }
+//         ],
+//         deleted: { $ne: true },
+//         // material: { $regex: type, $options: "i" },
+//         brands: { $in: [mongoose.Types.ObjectId(carBrand)] },
+//     } : {
+//         $or: [
+//             { name: { $regex: search, $options: "i" } },
+//             { serial: { $regex: search, $options: "i" } }
+//         ],
+//         deleted: { $ne: true },
+//         // material: { $regex: type, $options: "i" },
+//     })
+//     try {
+//         const settings = await Setting.findOne()
+//         const user = await User.findOne({ _id: req.body.requesterId })
+//         const findMyRate = async (currencyCode, base) => {
+//             const exchangeRate = await ExchangeRate.findOne({ base: base, }).sort({ createdAt: -1 }).exec();
+//             if (exchangeRate && exchangeRate?.rates && exchangeRate?.rates.hasOwnProperty(currencyCode)) {
+//                 return exchangeRate.rates[currencyCode];
+//             } else {
+//                 return 0;
+//             }
+//         }
+//         const products = await Product.aggregate([
+//             {
+//                 $match: match
+//             },
+//             {
+//                 $lookup: {
+//                     from: 'brands',
+//                     localField: 'brands',
+//                     foreignField: '_id',
+//                     as: 'brands'
+//                 }
+//             },
+
+//             {
+//                 $sort: { createdAt: -1, _id: -1 }
+//             },
+//             {
+//                 $skip: (page - 1) * 50
+//             },
+//             {
+//                 $limit: 50
+//             },
+
+//         ]);
+
+
+//         const totalDocs = await Product.countDocuments(match);
+//         const pages = Math.ceil(totalDocs / 50)
+//         if (products) {
+//             res.status(200).send({
+//                 products: products,
+//                 lastPage: page * 50 >= totalDocs ? true : false,
+//                 pages: pages,
+//                 current: page,
+//                 settings: {
+//                     ptPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.ptPrice : 0,
+//                     pdPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.pdPrice : 0,
+//                     rhPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.rhPrice : 0,
+//                     discount: user?.discount || 0,
+//                     gbpToCurrency: await findMyRate(user?.currency || "AED", "GBP"),
+//                     usdToCurrency: await findMyRate(user?.currency || "AED", "USD"),
+//                     canSeePrice: user ? ['admin', 'editor', 'viewer'].includes(req.body.requesterRole) : false,
+//                     currency: user?.currency || "AED",
+//                 },
+//             });
+//         } else {
+//             res.status(400).send({
+//                 products: [],
+//                 lastPage: true,
+//                 pages: 1,
+//                 current: 1,
+//                 settings: {
+//                     ptPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.ptPrice : 0,
+//                     pdPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.pdPrice : 0,
+//                     rhPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.rhPrice : 0,
+//                     discount: user?.discount || 0,
+//                     gbpToCurrency: await findMyRate(user?.currency || "AED", "GBP"),
+//                     usdToCurrency: await findMyRate(user?.currency || "AED", "USD"),
+//                     canSeePrice: user ? ['admin', 'editor', 'viewer'].includes(req.body.requesterRole) : false,
+//                     currency: user?.currency || "AED",
+//                 },
+//             });
+//         }
+//     } catch (error) {
+//         res.status(500).json({ err: 'error' })
+//     }
+// }
 const getProducts = async (req, res) => {
-    const page = req.query.page || 1;
-    const searchString = req.query.search || '';
-    const carBrand = req.query.brand || null;
-    const search = searchString
-    const match = ((carBrand) ? {
-        $or: [
-            { name: { $regex: search, $options: "i" } },
-            { serial: { $regex: search, $options: "i" } }
-        ],
-        deleted: { $ne: true },
-        // material: { $regex: type, $options: "i" },
-        brands: { $in: [mongoose.Types.ObjectId(carBrand)] },
-    } : {
-        $or: [
-            { name: { $regex: search, $options: "i" } },
-            { serial: { $regex: search, $options: "i" } }
-        ],
-        deleted: { $ne: true },
-        // material: { $regex: type, $options: "i" },
-    })
     try {
-        const settings = await Setting.findOne()
-        const user = await User.findOne({ _id: req.body.requesterId })
-        const findMyRate = async (currencyCode, base) => {
-            const exchangeRate = await ExchangeRate.findOne({ base: base, }).sort({ createdAt: -1 }).exec();
-            if (exchangeRate && exchangeRate?.rates && exchangeRate?.rates.hasOwnProperty(currencyCode)) {
-                return exchangeRate.rates[currencyCode];
-            } else {
-                return 0;
-            }
+        // Extract query parameters
+        const page = parseInt(req.query.page) || 1;
+        const searchString = req.query.search || '';
+        const carBrand = req.query.brand || null;
+        const userRole = req.body.requesterRole;
+        const userId = req.body.requesterId;
+
+        // Create the search filter
+        const searchFilter = {
+            $or: [
+                { name: { $regex: searchString, $options: "i" } },
+                { serial: { $regex: searchString, $options: "i" } }
+            ],
+            deleted: { $ne: true },
+        };
+
+        if (carBrand) {
+            searchFilter.brands = { $in: [mongoose.Types.ObjectId(carBrand)] };
         }
+
+  
         const products = await Product.aggregate([
             {
-                $match: match
+                $match: searchFilter
             },
             {
                 $lookup: {
@@ -75,7 +165,6 @@ const getProducts = async (req, res) => {
                     as: 'brands'
                 }
             },
-
             {
                 $sort: { createdAt: -1, _id: -1 }
             },
@@ -84,52 +173,45 @@ const getProducts = async (req, res) => {
             },
             {
                 $limit: 50
-            },
-
+            }
         ]);
 
+        // Calculate total pages
+        const totalDocs = await Product.countDocuments(searchFilter);
+        const pages = Math.ceil(totalDocs / 50);
 
-        const totalDocs = await Product.countDocuments(match);
-        const pages = Math.ceil(totalDocs / 50)
-        if (products) {
-            res.status(200).send({
-                products: products,
-                lastPage: page * 50 >= totalDocs ? true : false,
-                pages: pages,
-                current: page,
-                settings: {
-                    ptPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.ptPrice : 0,
-                    pdPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.pdPrice : 0,
-                    rhPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.rhPrice : 0,
-                    discount: user?.discount || 0,
-                    gbpToCurrency: await findMyRate(user?.currency || "AED", "GBP"),
-                    usdToCurrency: await findMyRate(user?.currency || "AED", "USD"),
-                    canSeePrice: user ? ['admin', 'editor', 'viewer'].includes(req.body.requesterRole) : false,
-                    currency: user?.currency || "AED",
-                },
-            });
-        } else {
-            res.status(400).send({
-                products: [],
-                lastPage: true,
-                pages: 1,
-                current: 1,
-                settings: {
-                    ptPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.ptPrice : 0,
-                    pdPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.pdPrice : 0,
-                    rhPrice: (user && ['admin', 'editor', 'viewer'].includes(req.body.requesterRole)) ? settings?.rhPrice : 0,
-                    discount: user?.discount || 0,
-                    gbpToCurrency: await findMyRate(user?.currency || "AED", "GBP"),
-                    usdToCurrency: await findMyRate(user?.currency || "AED", "USD"),
-                    canSeePrice: user ? ['admin', 'editor', 'viewer'].includes(req.body.requesterRole) : false,
-                    currency: user?.currency || "AED",
-                },
-            });
+        // Prepare the response
+        const settings = await Setting.findOne();
+        const user = await User.findOne({ _id: userId });
+        const findMyRate = async (currencyCode, base) => {
+            const exchangeRate = await ExchangeRate.findOne({ base: base, }).sort({ createdAt: -1 }).exec();
+            if (exchangeRate && exchangeRate?.rates && exchangeRate?.rates.hasOwnProperty(currencyCode)) {
+                return exchangeRate.rates[currencyCode];
+            } else {
+                return 0;
+            }
         }
+        res.status(200).send({
+            products: products,
+            lastPage: page * 50 >= totalDocs,
+            pages: pages,
+            current: page,
+            settings: {
+                ptPrice: (user && ['admin', 'editor', 'viewer'].includes(userRole)) ? settings?.ptPrice : 0,
+                pdPrice: (user && ['admin', 'editor', 'viewer'].includes(userRole)) ? settings?.pdPrice : 0,
+                rhPrice: (user && ['admin', 'editor', 'viewer'].includes(userRole)) ? settings?.rhPrice : 0,
+                discount: user?.discount || 0,
+                gbpToCurrency: await findMyRate(user?.currency || "AED", "GBP"),
+                usdToCurrency: await findMyRate(user?.currency || "AED", "USD"),
+                canSeePrice: user ? ['admin', 'editor', 'viewer'].includes(userRole) : false,
+                currency: user?.currency || "AED",
+            },
+        });
     } catch (error) {
-        res.status(500).json({ err: 'error' })
+        res.status(500).json({ err: 'error' });
     }
-}
+};
+
 const likeProduct = async (req, res) => {
     try {
         const product = await Product.findOne({ _id: req.params.productId }).populate('brands', ' _id name img')
