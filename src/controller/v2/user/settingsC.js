@@ -32,9 +32,9 @@ const getIndex = async (req, res) => {
                     };
                 }
             });
-            if (user) {
-                const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
-                const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
+            if (user && user._id) {
+                const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user.currency || 'AED'] : 0);
+                const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user.currency || 'AED'] : 0);
                 const gbpMin = Math.min(...gbpRatesOnly);
                 const gbpMax = Math.max(...gbpRatesOnly);
                 const usdMin = Math.min(...usdRatesOnly);
@@ -48,10 +48,9 @@ const getIndex = async (req, res) => {
                     usdMin: usdMin,
                     usdMax: usdMax,
                     user: {
-                        name: user?.name,
-                        currency: user?.currency || 'AED',
-                        totalSearches: user?.totalSearches,
-                        totalViews: user?.totalViews,
+                        name: user.name,
+                        currency: user.currency || 'AED',
+
                     },
                     settings: {
                         ptShowPrice: settings?.ptShowPrice,
@@ -77,8 +76,6 @@ const getIndex = async (req, res) => {
                     user: {
                         name: null,
                         currency: 'AED',
-                        totalSearches: 0,
-                        totalViews: 0,
                     },
                     settings: {
                         ptShowPrice: settings?.ptShowPrice,
