@@ -1,4 +1,3 @@
-const Product = require('../../../model/Product.js');
 const User = require('../../../model/User.js');
 const Setting = require('./../../../model/Setting.js')
 const ExchangeRate = require('./../../../model/ExchangeRate.js');
@@ -32,60 +31,33 @@ const getIndex = async (req, res) => {
                     };
                 }
             });
-            if (user && user.currency) {
-                console.log(1)
-                const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user.currency || 'AED'] : 0);
-                const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user.currency || 'AED'] : 0);
-                const gbpMin = Math.min(...gbpRatesOnly);
-                const gbpMax = Math.max(...gbpRatesOnly);
-                const usdMin = Math.min(...usdRatesOnly);
-                const usdMax = Math.max(...usdRatesOnly);
 
-                res.status(200).json({
-                    gbpStatistics: gbpStatistics,
-                    usdStatistics: usdStatistics,
-                    gbpMin: gbpMin,
-                    gbpMax: gbpMax,
-                    usdMin: usdMin,
-                    usdMax: usdMax,
-                    user: {
-                        name: user.name,
-                        currency: user.currency || 'AED',
+            const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
+            const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
+            const gbpMin = Math.min(...gbpRatesOnly);
+            const gbpMax = Math.max(...gbpRatesOnly);
+            const usdMin = Math.min(...usdRatesOnly);
+            const usdMax = Math.max(...usdRatesOnly);
 
-                    },
-                    settings: {
-                        ptShowPrice: settings?.ptShowPrice,
-                        pdShowPrice: settings?.pdShowPrice,
-                        rhShowPrice: settings?.rhShowPrice,
-                    }
-                })
-            } else {
-                console.log(2)
-                const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates['AED'] : 0);
-                const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates['AED'] : 0);
-                const gbpMin = Math.min(...gbpRatesOnly);
-                const gbpMax = Math.max(...gbpRatesOnly);
-                const usdMin = Math.min(...usdRatesOnly);
-                const usdMax = Math.max(...usdRatesOnly);
+            res.status(200).json({
+                gbpStatistics: gbpStatistics,
+                usdStatistics: usdStatistics,
+                gbpMin: gbpMin,
+                gbpMax: gbpMax,
+                usdMin: usdMin,
+                usdMax: usdMax,
+                user: {
+                    name: user?.name,
+                    currency: user?.currency || 'AED',
 
-                res.status(200).json({
-                    gbpStatistics: gbpStatistics,
-                    usdStatistics: usdStatistics,
-                    gbpMin: gbpMin,
-                    gbpMax: gbpMax,
-                    usdMin: usdMin,
-                    usdMax: usdMax,
-                    user: {
-                        name: null,
-                        currency: 'AED',
-                    },
-                    settings: {
-                        ptShowPrice: settings?.ptShowPrice,
-                        pdShowPrice: settings?.pdShowPrice,
-                        rhShowPrice: settings?.rhShowPrice,
-                    }
-                })
-            }
+                },
+                settings: {
+                    ptShowPrice: settings?.ptShowPrice,
+                    pdShowPrice: settings?.pdShowPrice,
+                    rhShowPrice: settings?.rhShowPrice,
+                }
+            })
+
         }
     } catch (error) {
         res.status(500).json({ err: 'error', });
