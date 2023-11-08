@@ -31,31 +31,61 @@ const getIndex = async (req, res) => {
                     };
                 }
             });
-            const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
-            const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
-            const gbpMin = Math.min(...gbpRatesOnly);
-            const gbpMax = Math.max(...gbpRatesOnly);
-            const usdMin = Math.min(...usdRatesOnly);
-            const usdMax = Math.max(...usdRatesOnly);
-            res.status(200).json({
-                gbpStatistics: gbpStatistics,
-                usdStatistics: usdStatistics,
-                gbpMin: gbpMin,
-                gbpMax: gbpMax,
-                usdMin: usdMin,
-                usdMax: usdMax,
-                user: {
-                    name: user?.name,
-                    currency: user?.currency || 'AED',
-                    totalSearches: user?.totalSearches,
-                    totalViews: user?.totalViews,
-                },
-                settings: {
-                    ptShowPrice: settings?.ptShowPrice,
-                    pdShowPrice: settings?.pdShowPrice,
-                    rhShowPrice: settings?.rhShowPrice,
-                }
-            })
+            if (user) {
+                const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
+                const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
+                const gbpMin = Math.min(...gbpRatesOnly);
+                const gbpMax = Math.max(...gbpRatesOnly);
+                const usdMin = Math.min(...usdRatesOnly);
+                const usdMax = Math.max(...usdRatesOnly);
+
+                res.status(200).json({
+                    gbpStatistics: gbpStatistics,
+                    usdStatistics: usdStatistics,
+                    gbpMin: gbpMin,
+                    gbpMax: gbpMax,
+                    usdMin: usdMin,
+                    usdMax: usdMax,
+                    user: {
+                        name: user?.name,
+                        currency: user?.currency || 'AED',
+                        totalSearches: user?.totalSearches,
+                        totalViews: user?.totalViews,
+                    },
+                    settings: {
+                        ptShowPrice: settings?.ptShowPrice,
+                        pdShowPrice: settings?.pdShowPrice,
+                        rhShowPrice: settings?.rhShowPrice,
+                    }
+                })
+            } else {
+                const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates['AED'] : 0);
+                const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates['AED'] : 0);
+                const gbpMin = Math.min(...gbpRatesOnly);
+                const gbpMax = Math.max(...gbpRatesOnly);
+                const usdMin = Math.min(...usdRatesOnly);
+                const usdMax = Math.max(...usdRatesOnly);
+
+                res.status(200).json({
+                    gbpStatistics: gbpStatistics,
+                    usdStatistics: usdStatistics,
+                    gbpMin: gbpMin,
+                    gbpMax: gbpMax,
+                    usdMin: usdMin,
+                    usdMax: usdMax,
+                    user: {
+                        name: null,
+                        currency: 'AED',
+                        totalSearches: 0,
+                        totalViews: 0,
+                    },
+                    settings: {
+                        ptShowPrice: settings?.ptShowPrice,
+                        pdShowPrice: settings?.pdShowPrice,
+                        rhShowPrice: settings?.rhShowPrice,
+                    }
+                })
+            }
         }
     } catch (error) {
         res.status(500).json({ err: 'error', });
