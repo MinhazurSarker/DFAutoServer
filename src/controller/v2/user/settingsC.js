@@ -33,6 +33,7 @@ const getIndex = async (req, res) => {
                 }
             });
             if (user && user.currency) {
+                console.log(1)
                 const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user.currency || 'AED'] : 0);
                 const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user.currency || 'AED'] : 0);
                 const gbpMin = Math.min(...gbpRatesOnly);
@@ -59,6 +60,7 @@ const getIndex = async (req, res) => {
                     }
                 })
             } else {
+                console.log(2)
                 const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates['AED'] : 0);
                 const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates['AED'] : 0);
                 const gbpMin = Math.min(...gbpRatesOnly);
