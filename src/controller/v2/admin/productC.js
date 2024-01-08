@@ -347,6 +347,7 @@ const getDeletedProducts = async (req, res) => {
             .status(200)
             .json({ msg: "success", array: histories, current: page, pages: pages });
     } catch (err) {
+        console.log(err);
         res.status(500).json({ err: 'error' })
     }
 }
