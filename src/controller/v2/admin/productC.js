@@ -155,7 +155,7 @@ const getProducts = async (req, res) => {
             searchFilter.brands = { $in: [mongoose.Types.ObjectId(carBrand)] };
         }
 
-  
+
         const products = await Product.aggregate([
             {
                 $match: searchFilter
@@ -335,7 +335,7 @@ const deleteProduct = async (req, res) => {
     }
 }
 const getDeletedProducts = async (req, res) => {
-    const page = req.params.page
+    const page = req.params.page || 1
     try {
         const totalDocs = await Product.countDocuments({ deleted: true });
         const pages = Math.ceil(totalDocs / 25)
