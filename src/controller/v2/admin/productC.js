@@ -365,11 +365,10 @@ const restoreProduct = async (req, res) => {
         res.status(500).json({ err: 'error' })
     }
 }
-const deleteProduct2 = async (req, res) => {
+const deleteProductPermanent = async (req, res) => {
     try {
         const product = await Product.findOne({ _id: req.params.productId })
         if (product) {
-
             product.img.map(
                 (item) => {
                     fs.unlink("./public" + item, (err) => {
@@ -395,5 +394,5 @@ module.exports = {
     likeProduct,
     getDeletedProducts,
     restoreProduct,
-
+    deleteProductPermanent,
 }
