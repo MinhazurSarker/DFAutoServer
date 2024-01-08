@@ -1,7 +1,7 @@
 const express = require('express');
 const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin, getMyProfile, updateProfile, deleteProfile } = require('./../controller/v2/admin/userC.js');
 const { getSettings, updateSettings, getIndex, getCalculator, } = require('./../controller/v2/admin/settingsC.js');
-const { createProduct, updateProduct, getProducts, getProduct, deleteProduct, likeProduct, getDeletedProducts, restoreProduct } = require('./../controller/v2/admin/productC.js');
+const { createProduct, updateProduct, getProducts, getProduct, deleteProduct, likeProduct, getDeletedProducts, restoreProduct, deleteProductPermanent } = require('./../controller/v2/admin/productC.js');
 const { isUser, isAdmin, isEditor, isAuth } = require('./../middleware/accessControl.js');
 const { imgUpload, brandImgUpload } = require('./../middleware/file.js');
 const { getBrands, getBrand, createBrand, updateBrand, deleteBrand } = require('../controller/v2/admin/brandC.js');
@@ -37,6 +37,7 @@ router.post('/product/like/:productId', isEditor, likeProduct)
 router.post('/products', isEditor, imgUpload, createProduct)
 router.post('/product/:productId', isEditor, imgUpload, updateProduct)
 router.delete('/product/:productId', isAdmin, deleteProduct)
+router.delete('/product/permanent/:productId', isAdmin, deleteProductPermanent)
 //----------------------------------------------------------------
 router.get('/brands', isAuth, getBrands)
 router.get('/brand/:brandId', isEditor, getBrand)
