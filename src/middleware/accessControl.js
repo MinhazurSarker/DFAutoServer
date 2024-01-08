@@ -191,6 +191,7 @@ const isAdmin = async (req, res, next) => {
             res.status(403).json({ msg: 'Need To Login' })
         }
     } catch (err) {
+        console.log(err)
         res.status(500).json({ err: err.message });
     }
 }
