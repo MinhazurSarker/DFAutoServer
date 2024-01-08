@@ -138,6 +138,7 @@ const getProducts = async (req, res) => {
         const carBrand = req.query.brand || null;
         const userRole = req.body.requesterRole;
         const userId = req.body.requesterId;
+        const type = req.query.type == 'ceramic' ? 'Ceramic' : req.query.type == 'metal' ? 'Metal' : '';
 
         // Create the search filter
         const searchFilter = {
@@ -147,7 +148,9 @@ const getProducts = async (req, res) => {
             ],
             deleted: { $ne: true },
         };
-
+        if (type !== '') {
+            searchFilter.material = { $regex: type, $options: "i" };
+        }
         if (carBrand) {
             searchFilter.brands = { $in: [mongoose.Types.ObjectId(carBrand)] };
         }

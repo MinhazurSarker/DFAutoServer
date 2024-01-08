@@ -11,6 +11,8 @@ const getIndex = async (req, res) => {
         const editor = await User.countDocuments({ role: 'editor' });
         const admins = await User.countDocuments({ role: 'admin' });
         const products = await Product.countDocuments({ deleted: { $ne: true } });
+        const ceramic = await Product.countDocuments({ deleted: { $ne: true } ,material:{ $regex: "Ceramic", $options: "i" }});
+        const metal = await Product.countDocuments({ deleted: { $ne: true } ,material:{ $regex: "Metal", $options: "i" }});
         const brands = await Brand.countDocuments();
 
         res.status(200).json({
@@ -19,6 +21,8 @@ const getIndex = async (req, res) => {
             editors: editor,
             admins: admins,
             products: products,
+            ceramic:ceramic,
+            metal:metal,
             brands: brands,
         })
 
