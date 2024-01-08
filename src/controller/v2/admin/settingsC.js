@@ -11,8 +11,8 @@ const getIndex = async (req, res) => {
         const editor = await User.countDocuments({ role: 'editor' });
         const admins = await User.countDocuments({ role: 'admin' });
         const products = await Product.countDocuments({ deleted: { $ne: true } });
-        const ceramic = await Product.countDocuments({ deleted: { $ne: true } ,material:{ $regex: "Ceramic", $options: "i" }});
-        const metal = await Product.countDocuments({ deleted: { $ne: true } ,material:{ $regex: "Metal", $options: "i" }});
+        const ceramic = await Product.countDocuments({ deleted: { $ne: true }, material: { $regex: "Ceramic", $options: "i" } });
+        const metal = await Product.countDocuments({ deleted: { $ne: true }, material: { $regex: "Metal", $options: "i" } });
         const brands = await Brand.countDocuments();
 
         res.status(200).json({
@@ -21,8 +21,8 @@ const getIndex = async (req, res) => {
             editors: editor,
             admins: admins,
             products: products,
-            ceramic:ceramic,
-            metal:metal,
+            ceramic: ceramic,
+            metal: metal,
             brands: brands,
         })
 
@@ -52,6 +52,8 @@ const getSettings = async (req, res) => {
                 ptShowPrice: 0,
                 pdShowPrice: 0,
                 rhShowPrice: 0,
+                email: [],
+                whatsApp: []
             };
             await Setting.create(defaultSettings);
         }
@@ -98,6 +100,8 @@ const updateSettings = async (req, res) => {
                 ptShowPrice: Number(req.body.ptShowPrice) || 0,
                 pdShowPrice: Number(req.body.pdShowPrice) || 0,
                 rhShowPrice: Number(req.body.rhShowPrice) || 0,
+                email: JSON.parse(req.body.email) || [],
+                whatsApp: JSON.parse(req.body.whatsApp) || [],
 
             };
             await Setting.create(defaultSettings);
@@ -109,6 +113,8 @@ const updateSettings = async (req, res) => {
             settingsDocument.ptShowPrice = Number(req.body.ptShowPrice) || 0;
             settingsDocument.pdShowPrice = Number(req.body.pdShowPrice) || 0;
             settingsDocument.rhShowPrice = Number(req.body.rhShowPrice) || 0;
+            settingsDocument.email = JSON.parse(req.body.email) || [];
+            settingsDocument.whatsApp = JSON.parse(req.body.whatsApp) || [];
             await settingsDocument.save()
         }
         const settings = await Setting.findOne();

@@ -9,6 +9,8 @@ const SettingSchema = new mongoose.Schema({
     rhShowPrice: { type: Number, required: true, default: 0, },
     usdToAed: { type: Number, required: true, default: 0, },
     gbpToAed: { type: Number, required: true, default: 0, },
+    email: { type: Array, required: true, default: [], },
+    whatsApp: { type: Array, required: true, default: [], },
 })
 const Setting = mongoose.model("Setting", SettingSchema);
 module.exports = Setting;
