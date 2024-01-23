@@ -150,10 +150,18 @@ const getProducts = async (req, res) => {
 
 
         const regexPattern = searchString
-            .split('')  
-            .map(char => (char === ' ' ? '\\s*' : char))
+            .split('')
+            .map(char => {
+                if (char.toLowerCase() === 'o' || char === '0') {
+                    return '[o0]';
+                } else if (char === ' ') {
+                    return '\\s*';
+                } else {
+                    return char;
+                }
+            })
             .join('.*');
-        // Create the search filter
+
         const searchFilter = {
             $or: [
                 { name: { $regex: regexPattern, $options: "i" } },
