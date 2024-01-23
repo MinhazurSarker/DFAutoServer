@@ -8,10 +8,10 @@ const History = require("../../../model/History")
 const createProduct = async (req, res) => {
     const files = req.files.map((file) => file.path.replace("public", "").split("\\").join("/"));
     try {
-        const latestProduct = await Product.findOne().sort({ serial: -1 });
+        const latestProduct = await Product.findOne().sort({ sn: -1 });
 
-
-        const nextSerialNumber = latestProduct ? latestProduct.serial + 1 : 1;
+        if (!latestProduct) { return res.status(500).send("Something went wrong"); }
+        const nextSerialNumber = latestProduct ? latestProduct.sn + 1 : 1;
 
         const product = await new Product({
             name: req.body.name,
@@ -34,6 +34,7 @@ const createProduct = async (req, res) => {
         await product.save()
         res.status(200).json({ msg: 'success', product: product })
     } catch (error) {
+        console.log(error)
         res.status(500).json({ err: 'error' })
     }
 }
