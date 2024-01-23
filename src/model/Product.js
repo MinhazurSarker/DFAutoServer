@@ -20,6 +20,7 @@ const ProductSchema = new mongoose.Schema(
         pt: { type: Number, required: true, default: 0, },
         pd: { type: Number, required: true, default: 0, },
         rh: { type: Number, required: true, default: 0, },
+        sn: { type: Number, unique: true },
         img: [String],
         likes: [
             {

@@ -189,7 +189,8 @@ const getProducts = async (req, res) => {
     const carBrand = req.query.brand || null;
     const userId = req.body.requesterId;
     const liked = req.query.liked || 'false';
-
+    const sort = parseInt(req.query.sort) || -1;
+    
     const match = {
         $or: [
             { name: { $regex: search, $options: "i" } },
@@ -235,7 +236,7 @@ const getProducts = async (req, res) => {
                 }
             },
             {
-                $sort: { createdAt: -1, _id: -1 }
+                $sort: { createdAt: sort == 1 ? 1 : -1, _id: sort == 1 ? 1 : -1 }
             },
             {
                 $skip: (page - 1) * 50
@@ -331,9 +332,30 @@ const getProduct = async (req, res) => {
     }
 }
 
+async function updateSerialNumbers() {
+    try {
+        const products = await Product.find().sort({ createdAt: 1 }); // Assuming you have a createdAt field
+
+        for (let i = 0; i < products.length; i++) {
+            const product = products[i];
+            product.sn = i + 1;
+
+            await product.save();
+        }
+
+        console.log('Serial numbers updated successfully.');
+    } catch (error) {
+        console.error('Error updating serial numbers:', error);
+    } finally {
+        mongoose.disconnect();
+    }
+}
+
+
 
 module.exports = {
     getProducts,
     getProduct,
-    likeProduct
+    likeProduct,
+    updateSerialNumbers,
 }

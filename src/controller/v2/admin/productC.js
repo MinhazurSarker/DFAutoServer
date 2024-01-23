@@ -134,6 +134,7 @@ const getProducts = async (req, res) => {
     try {
         // Extract query parameters
         const page = parseInt(req.query.page) || 1;
+        const sort = parseInt(req.query.sort) || -1;
         const searchString = req.query.search || '';
         const carBrand = req.query.brand || null;
         const userRole = req.body.requesterRole;
@@ -169,7 +170,7 @@ const getProducts = async (req, res) => {
                 }
             },
             {
-                $sort: { createdAt: -1, _id: -1 }
+                $sort: { createdAt: sort == 1 ? 1 : -1, _id: sort == 1 ? 1 : -1 }
             },
             {
                 $skip: (page - 1) * 50
