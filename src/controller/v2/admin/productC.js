@@ -10,7 +10,7 @@ const createProduct = async (req, res) => {
     try {
         const latestProduct = await Product.findOne().sort({ sn: -1 });
 
-        if (!latestProduct) { return res.status(500).send("Something went wrong"); }
+
         const nextSerialNumber = latestProduct ? latestProduct.sn + 1 : 1;
 
         const product = await new Product({
