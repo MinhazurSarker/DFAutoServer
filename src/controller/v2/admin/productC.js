@@ -148,11 +148,16 @@ const getProducts = async (req, res) => {
         const userId = req.body.requesterId;
         const type = req.query.type == 'ceramic' ? 'Ceramic' : req.query.type == 'metal' ? 'Metal' : '';
 
+
+        const regexPattern = searchString
+            .split('')  
+            .map(char => (char === ' ' ? '\\s*' : char))
+            .join('.*');
         // Create the search filter
         const searchFilter = {
             $or: [
-                { name: { $regex: searchString, $options: "i" } },
-                { serial: { $regex: searchString, $options: "i" } }
+                { name: { $regex: regexPattern, $options: "i" } },
+                { serial: { $regex: regexPattern, $options: "i" } }
             ],
             deleted: { $ne: true },
         };
