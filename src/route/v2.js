@@ -1,7 +1,7 @@
 const express = require('express');
 const { login, getMyProfile, registerUser, updateProfile, deleteProfile } = require('./../controller/v2/user/userC.js');
 const { getSettings, getIndex, getCalculator, } = require('./../controller/v2/user/settingsC.js');
-const { getProducts, getProduct, likeProduct, updateSerialNumbers } = require('./../controller/v2/user/productC.js');
+const { getProducts, getProduct, likeProduct, } = require('./../controller/v2/user/productC.js');
 const { isUser, isAdmin, isViewer, isApproved, isAuth } = require('./../middleware/accessControl.js');
 const { getBrands, } = require('../controller/v2/user/brandC.js');
 const { getPlans, getPlan, } = require('../controller/v2/user/planC.js');
@@ -12,7 +12,6 @@ const router = express();
 router.get('/', function (req, res) {
     res.send('ok')
 })
-router.get('/fix', updateSerialNumbers)
 router.post('/login', login)
 router.post('/register', registerUser)
 router.get('/profile', isUser, getMyProfile)

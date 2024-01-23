@@ -8,6 +8,11 @@ const History = require("../../../model/History")
 const createProduct = async (req, res) => {
     const files = req.files.map((file) => file.path.replace("public", "").split("\\").join("/"));
     try {
+        const latestProduct = await Product.findOne().sort({ serial: -1 });
+
+
+        const nextSerialNumber = latestProduct ? latestProduct.serial + 1 : 1;
+
         const product = await new Product({
             name: req.body.name,
             brand: req.body.brand,
@@ -24,6 +29,7 @@ const createProduct = async (req, res) => {
             pd: Number(req.body.pd) || 0,
             rh: Number(req.body.rh) || 0,
             img: files,
+            sn: nextSerialNumber,
         })
         await product.save()
         res.status(200).json({ msg: 'success', product: product })

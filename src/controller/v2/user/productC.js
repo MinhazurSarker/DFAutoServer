@@ -332,30 +332,10 @@ const getProduct = async (req, res) => {
     }
 }
 
-async function updateSerialNumbers() {
-    try {
-        const products = await Product.find().sort({ createdAt: 1 }); // Assuming you have a createdAt field
-
-        for (let i = 0; i < products.length; i++) {
-            const product = products[i];
-            product.sn = i + 1;
-
-            await product.save();
-        }
-
-        console.log('Serial numbers updated successfully.');
-    } catch (error) {
-        console.error('Error updating serial numbers:', error);
-    } finally {
-        mongoose.disconnect();
-    }
-}
-
 
 
 module.exports = {
     getProducts,
     getProduct,
     likeProduct,
-    updateSerialNumbers,
 }
