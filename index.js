@@ -11,9 +11,11 @@ const mongoose = require("mongoose");
 const { default: axios } = require('axios');
 const corn = require("node-cron");
 const ExchangeRate = require('./src/model/ExchangeRate');
-const { default: moment } = require('moment');
+const moment = require('moment');
 const User = require('./src/model/User');
 const Product = require('./src/model/Product');
+const stripeInstance = require('./src/services/stripeS');
+const Plan = require('./src/model/Plan');
 mongoose.set('strictQuery', false);
 
 const app = express();
@@ -41,6 +43,9 @@ global.appRoot = path.resolve(__dirname);
 dotenv.config();
 app.use(bp.json({ limit: "100mb" }));
 app.use(bp.urlencoded({ extended: true, limit: "100mb" }));
+
+
+app.use('/.wellknown/', express.static(path.join(__dirname, "wellknown")));
 app.use(express.static(path.join(__dirname, "public")));
 app.disable("x-powered-by");
 
@@ -77,6 +82,7 @@ const createNewExchangeRates = async (exchangeRateData, targetCurrency) => {
         console.log(error)
     }
 }
+
 corn.schedule("0 0 0 * * *", async () => {
     const key = process.env.EXC_API_KEY;
     // const apiUrl = `https://openexchangerates.org/api/latest.json?app_id=${key}`;
@@ -108,17 +114,17 @@ corn.schedule("0 0 0 * * *", async () => {
         console.log(error)
     }
 });
-corn.schedule("0 0 0 * * *", async () => {
 
-    try {
-        await User.updateMany(
-            { infinity: { $ne: true }, subEnd: { $lte: Date.now() } },
-            { role: "user" }
-        );
-    } catch (error) {
-        console.log(error)
-    }
+
+const { Worker } = require('worker_threads');
+corn.schedule("0 0 0 * * *", () => {
+    const worker = new Worker('./src/workers/userCheckWorker.js');
+    worker.on('message', (message) => {
+        console.log('Worker thread:', message);
+    });
+    worker.postMessage('start');
 });
 app.listen(5000, () => {
     console.log('listening on port number 5000')
 })
+

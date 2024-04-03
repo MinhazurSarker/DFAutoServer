@@ -2,60 +2,78 @@ const User = require('../../../model/User.js');
 const Setting = require('./../../../model/Setting.js')
 const ExchangeRate = require('./../../../model/ExchangeRate.js');
 const moment = require('moment');
+const LME = require('../../../model/LME.js');
+const stripeInstance = require('../../../services/stripeS.js');
 const getIndex = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.body.requesterId });
-        console.log(user)
-        const settings = await Setting.findOne();
-        const exchangeRateDocumentsGBP = await ExchangeRate.find({ base: "GBP" });
-        const exchangeRateDocumentsUSD = await ExchangeRate.find({ base: "USD" });
-        if (exchangeRateDocumentsGBP && exchangeRateDocumentsUSD) {
-
-            const gbpStatistics = exchangeRateDocumentsGBP?.map(doc => {
-                if (doc?.rates) {
-
-                    const userCurrencyRate = doc?.rates[user?.currency || 'AED'];
+        const settingsDocument = await Setting.findOne();
+        const lme = await LME.find();
+        if (lme) {
+            const pt = lme?.map(doc => {
+                if (doc?.ptShowPrice) {
                     return {
                         date: moment(doc.createdAt).format("DD-MM-YYYY"),
-                        rate: userCurrencyRate,
+                        rate: doc.ptShowPrice,
                     };
                 }
             });
-            const usdStatistics = exchangeRateDocumentsUSD?.map(doc => {
-                if (doc?.rates) {
-
-                    const userCurrencyRate = doc?.rates[user?.currency || 'AED'];
+            const pd = lme?.map(doc => {
+                if (doc?.pdShowPrice) {
                     return {
                         date: moment(doc.createdAt).format("DD-MM-YYYY"),
-                        rate: userCurrencyRate,
+                        rate: doc.pdShowPrice,
+                    };
+                }
+            });
+            const rh = lme?.map(doc => {
+                if (doc?.rhShowPrice) {
+                    return {
+                        date: moment(doc.createdAt).format("DD-MM-YYYY"),
+                        rate: doc.rhShowPrice,
                     };
                 }
             });
 
-            const gbpRatesOnly = exchangeRateDocumentsGBP.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
-            const usdRatesOnly = exchangeRateDocumentsUSD.map(doc => doc.rates ? doc.rates[user?.currency || 'AED'] : 0);
-            const gbpMin = Math.min(...gbpRatesOnly);
-            const gbpMax = Math.max(...gbpRatesOnly);
-            const usdMin = Math.min(...usdRatesOnly);
-            const usdMax = Math.max(...usdRatesOnly);
+            // const ptRatesOnly = pt.map(doc => doc?.rate ? doc.rate : 0);
+            // const ptMin = Math.min(...ptRatesOnly);
+            // const ptMax = Math.max(...ptRatesOnly);
 
+            // const pdRatesOnly = pd.map(doc => doc?.rate ? doc.rate : 0);
+            // const pdMin = Math.min(...pdRatesOnly);
+            // const pdMax = Math.max(...pdRatesOnly);
+
+            // const rhRatesOnly = rh.map(doc => doc?.rate ? doc.rate : 0);
+            // const rhMin = Math.min(...rhRatesOnly);
+            // const rhMax = Math.max(...rhRatesOnly);
             res.status(200).json({
-                gbpStatistics: gbpStatistics,
-                usdStatistics: usdStatistics,
-                gbpMin: gbpMin,
-                gbpMax: gbpMax,
-                usdMin: usdMin,
-                usdMax: usdMax,
+                settings: {
+                    pt: settingsDocument?.ptShowPrice,
+                    pd: settingsDocument?.pdShowPrice,
+                    rh: settingsDocument?.rhShowPrice
+                },
                 user: {
                     name: user?.name,
                     currency: user?.currency || 'AED',
 
                 },
-                settings: {
-                    ptShowPrice: settings?.ptShowPrice,
-                    pdShowPrice: settings?.pdShowPrice,
-                    rhShowPrice: settings?.rhShowPrice,
-                }
+                pt: {
+                    stats: pt,
+                    // max: ptMax,
+                    // min: ptMin
+                },
+                pd: {
+                    stats: pd,
+                    // max: pdMax,
+                    // min: pdMin
+                },
+                rh: {
+                    stats: rh,
+                    // max: rhMax,
+                    // min: rhMin
+                },
+
+
             })
 
         }
@@ -95,6 +113,32 @@ const getSettings = async (req, res) => {
         res.status(500).json({ err: 'error', });
     }
 }
+const getContacts = async (req, res) => {
+    try {
+        const settingsDocument = await Setting.findOne();
+
+        if (!settingsDocument) {
+            const defaultSettings = {
+                id: 1,
+                ptPrice: 0,
+                pdPrice: 0,
+                rhPrice: 0,
+                ptShowPrice: 0,
+                pdShowPrice: 0,
+                rhShowPrice: 0,
+                email: [],
+                whatsApp: []
+            };
+            await Setting.create(defaultSettings);
+        }
+        const settings = await Setting.findOne();
+
+        res.status(200).json({ msg: 'success', emails: settings?.email, whatsApp: settings?.whatsApp });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ err: 'error', });
+    }
+}
 const getCalculator = async (req, res) => {
     try {
         const getRates = async (base) => {
@@ -107,10 +151,34 @@ const getCalculator = async (req, res) => {
         res.status(500).json({ err: 'error', });
     }
 }
-
+const getCurrentBalance = async (req, res) => {
+    try {
+        const balance = await stripeInstance.balance.retrieve();
+        const paymentIntents = await stripeInstance.paymentIntents.list({
+            limit: 200,
+        });
+        res.status(200).json({
+            balance: balance,
+            paymentIntents: paymentIntents.data,
+        })
+        console.log(paymentIntents)
+    } catch (error) {
+        console.log(error)
+        res.status(200).json({
+            balance: {
+                object: 'balance',
+                available: [{ amount: 0, currency: 'aed', }],
+                pending: [{ amount: 0, currency: 'aed', }]
+            },
+            paymentIntents: [],
+        })
+    }
+}
 
 module.exports = {
     getIndex,
     getSettings,
     getCalculator,
+    getContacts,
+    getCurrentBalance
 }

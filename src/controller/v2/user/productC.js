@@ -185,16 +185,29 @@ const getProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const searchString = req.query.search || '';
     const type = req.query.type == 'ceramic' ? 'Ceramic' : req.query.type == 'metal' ? 'Metal' : '';
-    const search = searchString.replace(/\s+/g, '');
+
     const carBrand = req.query.brand || null;
     const userId = req.body.requesterId;
     const liked = req.query.liked || 'false';
     const sort = parseInt(req.query.sort) || -1;
-    
+
+    const regexPattern = searchString
+        .split('')
+        .map(char => {
+            if (char.toLowerCase() === 'o' || char === '0') {
+                return '[o0]';
+            } else if (char === ' ') {
+                return '\\s*';
+            } else {
+                return char;
+            }
+        })
+        .join('.*');
+
     const match = {
         $or: [
-            { name: { $regex: search, $options: "i" } },
-            { serial: { $regex: search, $options: "i" } }
+            { name: { $regex: regexPattern, $options: "i" } },
+            { serial: { $regex: regexPattern, $options: "i" } }
         ],
         deleted: { $ne: true },
     };
@@ -204,11 +217,11 @@ const getProducts = async (req, res) => {
     }
 
     if (carBrand) {
-        match.brands = { $in: [mongoose.Types.ObjectId(carBrand)] };
+        match.brands = { $in: [new mongoose.Types.ObjectId(carBrand)] };
     }
 
     if (liked === 'true' || liked == true) {
-        match.likes = { $in: [mongoose.Types.ObjectId(userId)] };
+        match.likes = { $in: [new mongoose.Types.ObjectId(userId)] };
     }
 
     try {
@@ -243,9 +256,15 @@ const getProducts = async (req, res) => {
             },
             {
                 $limit: 50
+            },
+            {
+                $addFields: {
+                    isLiked: {
+                        $in: [new mongoose.Types.ObjectId(user?._id), "$likes"]
+                    }
+                }
             }
         ]);
-
         const totalDocs = await Product.countDocuments(match);
         const pages = Math.ceil(totalDocs / 50);
 
@@ -275,16 +294,17 @@ const likeProduct = async (req, res) => {
         const product = await Product.findOne({ _id: req.params.productId }).populate('brands', ' _id name img')
         if (!product?.likes?.includes(req.body.requesterId)) {
             product?.likes?.push(req.body.requesterId);
-            product?.save()
+            await product?.save()
+            console.log({ ...JSON.parse(JSON.stringify(product)) })
             res
                 .status(200)
-                .json({ type: "liked", msg: "Added to favorites" });
+                .json({ type: "liked", msg: "Added to favorites", product: { isLiked: true, ...JSON.parse(JSON.stringify(product)) } });
         } else {
-            product.likes.pull(req.body.requesterId);
-            product?.save()
+            product?.likes?.pull(req.body.requesterId);
+            await product?.save()
             res
                 .status(200)
-                .json({ type: "removed", msg: "removed from favorites" });
+                .json({ type: "removed", msg: "removed from favorites", product: { isLiked: false, ...JSON.parse(JSON.stringify(product)) } });
         }
 
     } catch (error) {

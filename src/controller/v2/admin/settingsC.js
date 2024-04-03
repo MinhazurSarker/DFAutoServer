@@ -4,6 +4,7 @@ const User = require('../../../model/User.js');
 const Setting = require('./../../../model/Setting.js')
 const ExchangeRate = require('./../../../model/ExchangeRate.js');
 const moment = require('moment');
+const LME = require('../../../model/LME.js');
 const getIndex = async (req, res) => {
     try {
         const users = await User.countDocuments({ role: 'user' });
@@ -58,6 +59,7 @@ const getSettings = async (req, res) => {
             await Setting.create(defaultSettings);
         }
         const settings = await Setting.findOne();
+
         res.status(200).json({ msg: 'success', settings: settings, gbpToCurrency: await findMyRate(user?.currency || "AED", "GBP"), usdToCurrency: await findMyRate(user?.currency || "AED", "USD"), currency: user?.currency || "AED" });
     } catch (error) {
         console.log(error)
@@ -94,12 +96,6 @@ const updateSettings = async (req, res) => {
         if (!settingsDocument) {
             const defaultSettings = {
                 id: 1,
-                ptPrice: Number(req.body.ptPrice) || 0,
-                pdPrice: Number(req.body.pdPrice) || 0,
-                rhPrice: Number(req.body.rhPrice) || 0,
-                ptShowPrice: Number(req.body.ptShowPrice) || 0,
-                pdShowPrice: Number(req.body.pdShowPrice) || 0,
-                rhShowPrice: Number(req.body.rhShowPrice) || 0,
                 email: JSON.parse(req.body.email) || [],
                 whatsApp: JSON.parse(req.body.whatsApp) || [],
 
@@ -107,12 +103,6 @@ const updateSettings = async (req, res) => {
             await Setting.create(defaultSettings);
         } else {
             settingsDocument.id = 1;
-            settingsDocument.ptPrice = Number(req.body.ptPrice) || 0;
-            settingsDocument.pdPrice = Number(req.body.pdPrice) || 0;
-            settingsDocument.rhPrice = Number(req.body.rhPrice) || 0;
-            settingsDocument.ptShowPrice = Number(req.body.ptShowPrice) || 0;
-            settingsDocument.pdShowPrice = Number(req.body.pdShowPrice) || 0;
-            settingsDocument.rhShowPrice = Number(req.body.rhShowPrice) || 0;
             settingsDocument.email = JSON.parse(req.body.email) || [];
             settingsDocument.whatsApp = JSON.parse(req.body.whatsApp) || [];
             await settingsDocument.save()
@@ -124,11 +114,65 @@ const updateSettings = async (req, res) => {
         res.status(500).json({ err: 'error', });
     }
 }
+const updateLME = async (req, res) => {
+    console.log('hi')
+    try {
+        const settingsDocument = await Setting.findOne();
+        if (!settingsDocument) {
+            const defaultSettings = {
+                id: 1,
+                ptPrice: Number(req.body.ptPrice) || 0,
+                pdPrice: Number(req.body.pdPrice) || 0,
+                rhPrice: Number(req.body.rhPrice) || 0,
+                ptShowPrice: Number(req.body.ptShowPrice) || 0,
+                pdShowPrice: Number(req.body.pdShowPrice) || 0,
+                rhShowPrice: Number(req.body.rhShowPrice) || 0,
 
+            };
+            await Setting.create(defaultSettings);
+        } else {
+            settingsDocument.id = 1;
+            settingsDocument.ptPrice = Number(req.body.ptPrice) || 0;
+            settingsDocument.pdPrice = Number(req.body.pdPrice) || 0;
+            settingsDocument.rhPrice = Number(req.body.rhPrice) || 0;
+            settingsDocument.ptShowPrice = Number(req.body.ptShowPrice) || 0;
+            settingsDocument.pdShowPrice = Number(req.body.pdShowPrice) || 0;
+            settingsDocument.rhShowPrice = Number(req.body.rhShowPrice) || 0;
+            await settingsDocument.save()
+        }
+        const today = moment(Date.now()).format('YYYY-MM-DD')
+        const lastLme = await LME.findOne().sort({ createdAt: -1 })
+        if (today == moment(lastLme?.createdAt).format('YYYY-MM-DD') && lastLme) {
+            lastLme.ptPrice = Number(req.body.ptPrice) || 0;
+            lastLme.pdPrice = Number(req.body.pdPrice) || 0;
+            lastLme.rhPrice = Number(req.body.rhPrice) || 0;
+            lastLme.ptShowPrice = Number(req.body.ptShowPrice) || 0;
+            lastLme.pdShowPrice = Number(req.body.pdShowPrice) || 0;
+            lastLme.rhShowPrice = Number(req.body.rhShowPrice) || 0;
+            await lastLme.save()
+        } else {
+            const lme = await new LME({
+                ptPrice: Number(req.body.ptPrice) || 0,
+                pdPrice: Number(req.body.pdPrice) || 0,
+                rhPrice: Number(req.body.rhPrice) || 0,
+                ptShowPrice: Number(req.body.ptShowPrice) || 0,
+                pdShowPrice: Number(req.body.pdShowPrice) || 0,
+                rhShowPrice: Number(req.body.rhShowPrice) || 0,
+            })
+            await lme.save()
+        }
+        const settings = await Setting.findOne();
+        res.status(200).json({ msg: 'success', settings: settings });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ err: 'error', });
+    }
+}
 module.exports = {
     getIndex,
     getSettings,
     updateSettings,
     getCalculator,
-    getCurrencies
+    getCurrencies,
+    updateLME,
 }

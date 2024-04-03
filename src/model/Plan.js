@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const PlanSchema = new mongoose.Schema(
     {
         title: { type: String, required: true },
-        days: { type: Number },
-        price: { type: Number }
+        days: { type: Number, default: 0 },
+        price: { type: Number, default: 0 },
     },
     {
         timestamps: true

@@ -1,12 +1,13 @@
 const express = require('express');
 const { createUser, login, updateUser, deleteUser, getUser, getUsers, createAdmin, getMyProfile, updateProfile, deleteProfile } = require('./../controller/v2/admin/userC.js');
-const { getSettings, updateSettings, getIndex, getCalculator, } = require('./../controller/v2/admin/settingsC.js');
+const { getSettings, updateSettings, getIndex, getCalculator, updateLME, } = require('./../controller/v2/admin/settingsC.js');
 const { createProduct, updateProduct, getProducts, getProduct, deleteProduct, likeProduct, getDeletedProducts, restoreProduct, deleteProductPermanent } = require('./../controller/v2/admin/productC.js');
 const { isUser, isAdmin, isEditor, isAuth } = require('./../middleware/accessControl.js');
 const { imgUpload, brandImgUpload } = require('./../middleware/file.js');
 const { getBrands, getBrand, createBrand, updateBrand, deleteBrand } = require('../controller/v2/admin/brandC.js');
 const { getPlans, getPlan, createPlan, updatePlan, deletePlan } = require('../controller/v2/admin/planC.js');
 const { getHistory, deleteHistory, clearHistory } = require('../controller/v2/admin/historyC.js');
+const { getCurrentBalance } = require('../controller/v2/user/settingsC.js');
 
 const router = express();
 
@@ -27,8 +28,10 @@ router.post('/user/:userId', isAdmin, updateUser)
 router.delete('/user/:userId', isAdmin, deleteUser)
 //----------------------------------------------------------------
 router.get('/settings', isEditor, getSettings)
+router.get('/balance/:page', isAdmin, getCurrentBalance)
 router.get('/calculator', isEditor, getCalculator)
 router.post('/settings', isAdmin, updateSettings)
+router.post('/settings/lme', isEditor, updateLME)
 //----------------------------------------------------------------
 router.get('/index', isAuth, getIndex)
 router.get('/products', isAuth, getProducts)

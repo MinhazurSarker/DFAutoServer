@@ -99,9 +99,10 @@ const createUser = async (req, res) => {
 const getUsers = async (req, res) => {
     try {
         const page = req.query.page
+        const search = req.query.search
         const totalDocs = await User.countDocuments({ role: req.query.tab || 'user' });
         const pages = Math.ceil(totalDocs / 25)
-        const users = await User.find({ role: req.query.tab || 'user' })
+        const users = await User.find({ email: { $regex: search, $options: "i" }, role: req.query.tab || 'user' })
             .select('_id email role name ')
             .sort({ createdAt: -1 })
             .skip(25 * (page - 1))
