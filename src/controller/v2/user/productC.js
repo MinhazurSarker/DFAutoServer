@@ -192,12 +192,8 @@ const getProducts = async (req, res) => {
     const sort = parseInt(req.query.sort) || -1;
 
     const regexPattern = searchString
-        .replace(/o/g, '[o0]')
-        .replace(/0/g, '[o0]')
-        .replace(/\s/g, '\\s*')
-        .split('')
-        .join('.*');
-
+        .replace(/[o0]/g, '[o0]')
+        .replace(/\s/g, '\\s*');
     // const regexPattern = searchString
     //     .split('')
     //     .map(char => {
@@ -210,6 +206,7 @@ const getProducts = async (req, res) => {
     //         }
     //     })
     //     .join('.*');
+
 
     const match = {
         $or: [
