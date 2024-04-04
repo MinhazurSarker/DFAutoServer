@@ -192,17 +192,24 @@ const getProducts = async (req, res) => {
     const sort = parseInt(req.query.sort) || -1;
 
     const regexPattern = searchString
+        .replace(/o/g, '[o0]')
+        .replace(/0/g, '[o0]')
+        .replace(/\s/g, '\\s*')
         .split('')
-        .map(char => {
-            if (char.toLowerCase() === 'o' || char === '0') {
-                return '[o0]';
-            } else if (char === ' ') {
-                return '\\s*';
-            } else {
-                return char;
-            }
-        })
         .join('.*');
+
+    // const regexPattern = searchString
+    //     .split('')
+    //     .map(char => {
+    //         if (char.toLowerCase() === 'o' || char === '0') {
+    //             return '[o0]';
+    //         } else if (char === ' ') {
+    //             return '\\s*';
+    //         } else {
+    //             return char;
+    //         }
+    //     })
+    //     .join('.*');
 
     const match = {
         $or: [
