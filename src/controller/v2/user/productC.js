@@ -206,6 +206,7 @@ const getProducts = async (req, res) => {
 
     const match = {
         $or: [
+            { name: searchString },
             { name: { $regex: regexPattern, $options: "i" } },
             { serial: { $regex: regexPattern, $options: "i" } }
         ],

@@ -164,6 +164,7 @@ const getProducts = async (req, res) => {
 
         const searchFilter = {
             $or: [
+                { name: searchString },
                 { name: { $regex: regexPattern, $options: "i" } },
                 { serial: { $regex: regexPattern, $options: "i" } }
             ],
