@@ -246,21 +246,45 @@ const getProducts = async (req, res) => {
                 $match: match
             },
             {
-                $lookup: {
-                    from: 'brands',
-                    localField: 'brands',
-                    foreignField: '_id',
-                    as: 'brands'
+                $addFields: {
+                    exactMatch: { $cond: [{ $eq: ["$name", searchString] }, 1, 0] },
+                    similarity: {
+                        $cond: [
+                            { $eq: [searchString, ""] },
+                            0,
+                            {
+                                $size: {
+                                    $setIntersection: [
+                                        { $split: searchString, "" },
+                                        { $split: "$name", "" }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
                 }
             },
             {
-                $sort: { createdAt: sort == 1 ? 1 : -1, _id: sort == 1 ? 1 : -1 }
+                $sort: {
+                    exactMatch: -1,
+                    similarity: -1,
+                    createdAt: sort == 1 ? 1 : -1,
+                    _id: sort == 1 ? 1 : -1
+                }
             },
             {
                 $skip: (page - 1) * 50
             },
             {
                 $limit: 50
+            },
+            {
+                $lookup: {
+                    from: 'brands',
+                    localField: 'brands',
+                    foreignField: '_id',
+                    as: 'brands'
+                }
             },
             {
                 $addFields: {
@@ -270,6 +294,7 @@ const getProducts = async (req, res) => {
                 }
             }
         ]);
+
         const totalDocs = await Product.countDocuments(match);
         const pages = Math.ceil(totalDocs / 50);
 
