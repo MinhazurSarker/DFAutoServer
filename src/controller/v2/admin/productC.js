@@ -162,10 +162,10 @@ const getProducts = async (req, res) => {
         //     })
         //     .join('.*');
         const regexPattern = searchString
-            .replace(' ', '')
-            .replace('-', '')
-            .replace(/[o0]/g, '[o0]')
-            .replace(/\s/g, '\\s*');
+            .replace(/[^a-zA-Z0-9]/g, '') // Remove non-alphanumeric characters
+            .replace(/[oO]/g, '[oO]')       // Treat 'o' and 'O' as same
+            .replace(/[0]/g, '[0o]')        // Treat '0' as same as 'o'
+            .replace(/\s/g, '\\s*');        // Replace spaces
 
         const searchFilter = {
             $or: [
