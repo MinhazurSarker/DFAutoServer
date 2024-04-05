@@ -193,18 +193,18 @@ const getProducts = async (req, res) => {
 
 
     const regexPattern = '^' + searchString
-        .replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') // Escape special regex characters
-        .replace(/[oO]/g, '[oO]')                 // Treat 'o' and 'O' as same
-        .replace(/[0]/g, '[0o]')                  // Treat '0' as same as 'o'
+        .replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
         .split('')
         .map(char => {
             if (char === ' ') {
                 return '\\s*';
-            } else {
+            } else if (/[a-zA-Z0-9]/.test(char)) {
                 return char;
+            } else {
+                return '';
             }
         })
-        .join('.*') + '$';
+        .join('') + '$';
     // const regexPattern = searchString
     //     .split('')
     //     .map(char => {
