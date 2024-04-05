@@ -200,13 +200,11 @@ const getProducts = async (req, res) => {
         .map(char => {
             if (char === ' ') {
                 return '\\s*';
-            } else if (/[a-zA-Z0-9]/.test(char)) {
-                return char;
             } else {
-                return '';
+                return char;
             }
         })
-        .join('') + '$';
+        .join('.*') + '$';
     // const regexPattern = searchString
     //     .split('')
     //     .map(char => {
