@@ -191,20 +191,13 @@ const getProducts = async (req, res) => {
     const liked = req.query.liked || 'false';
     const sort = parseInt(req.query.sort) || -1;
 
-
     const regexPattern = '^' + searchString
-        .replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
+        .replace(/[oO]/g, '[oO]')             // Treat 'o' and 'O' as same
+        .replace(/[0]/g, '[0o]')              // Treat '0' as same as 'o'
+        .replace(/[^a-zA-Z0-9]/g, '')        // Remove characters other than letters and digits
         .split('')
-        .map(char => {
-            if (char === ' ') {
-                return '\\s*';
-            } else if (/[a-zA-Z0-9]/.test(char)) {
-                return char;
-            } else {
-                return '';
-            }
-        })
-        .join('') + '$';
+        .join('.*') + '$';
+
     // const regexPattern = searchString
     //     .split('')
     //     .map(char => {
