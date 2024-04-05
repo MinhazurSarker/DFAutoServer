@@ -162,6 +162,8 @@ const getProducts = async (req, res) => {
         //     })
         //     .join('.*');
         const regexPattern = searchString
+            .replace(' ', '')
+            .replace('-', '')
             .replace(/[o0]/g, '[o0]')
             .replace(/\s/g, '\\s*');
 

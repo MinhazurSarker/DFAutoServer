@@ -192,6 +192,8 @@ const getProducts = async (req, res) => {
     const sort = parseInt(req.query.sort) || -1;
 
     const regexPattern = searchString
+        .replace(' ', '')
+        .replace('-', '')
         .replace(/[o0]/g, '[o0]')
         .replace(/\s/g, '\\s*');
     // const regexPattern = searchString
