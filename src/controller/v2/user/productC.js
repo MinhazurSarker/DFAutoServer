@@ -191,7 +191,7 @@ const getProducts = async (req, res) => {
     const liked = req.query.liked || 'false';
     const sort = parseInt(req.query.sort) || -1;
 
-    const regexPattern = searchString.split(' ').join('')
+    const regexPattern = searchString
         .replace(/[o0]/g, '[o0]')
         .replace(/\s/g, '\\s*')
 
