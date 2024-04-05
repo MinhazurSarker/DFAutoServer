@@ -196,9 +196,17 @@ const getProducts = async (req, res) => {
         .replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') // Escape special regex characters
         .replace(/[oO]/g, '[oO]')                 // Treat 'o' and 'O' as same
         .replace(/[0]/g, '[0o]')                  // Treat '0' as same as 'o'
-        .replace(/\s/g, '\\s*')                   // Replace space with optional space
-        .replace(/(.)/g, '($1)?')                 // Make each character optional
-        .replace(/[^a-zA-Z0-9]/g, '');
+        .split('')
+        .map(char => {
+            if (char === ' ') {
+                return '\\s*';
+            } else if (/[a-zA-Z0-9]/.test(char)) {
+                return char;
+            } else {
+                return '';
+            }
+        })
+        .join('') + '$';
     // const regexPattern = searchString
     //     .split('')
     //     .map(char => {
