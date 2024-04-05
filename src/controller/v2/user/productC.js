@@ -191,11 +191,14 @@ const getProducts = async (req, res) => {
     const liked = req.query.liked || 'false';
     const sort = parseInt(req.query.sort) || -1;
 
-    const regexPattern = searchString
-        .replace(/[^a-zA-Z0-9]/g, '')
+
+
+    const regexPattern = '^' + searchString
+        .replace(/[^a-zA-Z0-9\s-]/g, '')
         .replace(/[o0]/g, '[o0]')
         .replace(/\s/g, '\\s*')
-        .replace(/-/g, '-?');
+        .replace(/-/g, '-?')
+        .replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1') + '$';
     // const regexPattern = searchString
     //     .split('')
     //     .map(char => {
