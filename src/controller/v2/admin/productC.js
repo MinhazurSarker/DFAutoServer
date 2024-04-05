@@ -149,24 +149,19 @@ const getProducts = async (req, res) => {
         const type = req.query.type == 'ceramic' ? 'Ceramic' : req.query.type == 'metal' ? 'Metal' : '';
 
 
-        // const regexPattern = searchString
-        //     .split('')
-        //     .map(char => {
-        //         if (char.toLowerCase() === 'o' || char === '0') {
-        //             return '[o0]';
-        //         } else if (char === ' ') {
-        //             return '\\s*';
-        //         } else {
-        //             return char;
-        //         }
-        //     })
-        //     .join('.*');
         const regexPattern = searchString
-            .replace(/[^a-zA-Z0-9]/g, '') // Remove non-alphanumeric characters
-            .replace(/[oO]/g, '[oO]')       // Treat 'o' and 'O' as same
-            .replace(/[0]/g, '[0o]')        // Treat '0' as same as 'o'
-            .replace(/\s/g, '\\s*')         // Replace spaces
-            .split('').join('-?');
+            .split('')
+            .map(char => {
+                if (char.toLowerCase() === 'o' || char === '0') {
+                    return '[o0]';
+                } else if (char === ' ') {
+                    return '\\s*';
+                } else {
+                    return char;
+                }
+            })
+            .join('.*');
+
         const searchFilter = {
             $or: [
                 { name: searchString },
