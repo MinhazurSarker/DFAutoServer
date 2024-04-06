@@ -53,6 +53,9 @@ app.disable("x-powered-by");
 app.get('/', (req, res) => {
     res.status(200).json({ msg: 'OK' });
 })
+app.use('/privacy/', async (req, res) => {
+    res.send(privacyPolicy)
+})
 app.use('/api/', require('./src/route/api'))
 app.use('/api/v2/', require('./src/route/v2'))
 app.use('/api/admin/', require('./src/route/admin'))
@@ -117,6 +120,7 @@ corn.schedule("0 0 0 * * *", async () => {
 
 
 const { Worker } = require('worker_threads');
+const { privacyPolicy } = require('./src/utils/html');
 corn.schedule("0 0 0 * * *", () => {
     const worker = new Worker('./src/workers/userCheckWorker.js');
     worker.on('message', (message) => {
