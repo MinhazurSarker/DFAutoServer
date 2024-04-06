@@ -86,8 +86,23 @@ const privacyPolicy = `
     </body>
     </html>
       `
+const deleteReq = `
+<!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset='utf-8'>
+      <meta name='viewport' content='width=device-width'>
+      <title>Privacy Policy</title>
+      <style> body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding:1em; } </style>
+    </head>
+    <body>
+    <a href="mailto:dfauto63@gmail.com?subject=Request%20for%20Account%20Delete&body=Your%20email%20address%3A%0D%0A%0D%0AYour%20Name%3A%0D%0A%0D%0APhone%20Number%3A%0D%0A%0D%0AReason%20to%20delete%3A">Click here to send an email to request account deletion</a>
+    </body>
+    </html>
+      `
 
 module.exports = {
+    deleteReq,
     privacyPolicy,
     successful,
     failed
