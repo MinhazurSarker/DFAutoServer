@@ -149,7 +149,8 @@ const getProducts = async (req, res) => {
         const type = req.query.type == 'ceramic' ? 'Ceramic' : req.query.type == 'metal' ? 'Metal' : '';
 
 
-        const regexPattern = searchString
+
+        const pattern = searchString
             .split('')
             .map(char => {
                 if (char.toLowerCase() === 'o' || char === '0') {
@@ -160,7 +161,8 @@ const getProducts = async (req, res) => {
                     return char;
                 }
             })
-            .join('.*');
+            .join('');
+        const regexPattern = `^.*${pattern}.*$`;
         // const regexPattern = searchString
         //     .replace(/[o0]/g, '[o0]')
         //     .replace(/\s/g, '\\s*');
@@ -194,7 +196,17 @@ const getProducts = async (req, res) => {
                 }
             },
             {
-                $sort: { createdAt: sort == 1 ? 1 : -1, _id: sort == 1 ? 1 : -1 }
+                $sort: searchString !== '' ? {
+                    name: -1,
+                    createdAt: sort == 1 ? 1 : -1,
+                    _id: sort == 1 ? 1 : -1,
+
+                } : {
+
+                    createdAt: sort == 1 ? 1 : -1,
+                    _id: sort == 1 ? 1 : -1,
+
+                }
             },
             {
                 $skip: (page - 1) * 50
