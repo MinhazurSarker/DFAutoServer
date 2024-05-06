@@ -196,8 +196,13 @@ const getProducts = async (req, res) => {
                 }
             },
             {
+                $addFields: {
+                    nameLength: { $strLenCP: "$name" } // Add field for length of the name
+                }
+            },
+            {
                 $sort: searchString !== '' ? {
-                    name: -1,
+                    nameLength: 1,
                     createdAt: sort == 1 ? 1 : -1,
                     _id: sort == 1 ? 1 : -1,
 
