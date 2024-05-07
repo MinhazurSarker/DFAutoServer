@@ -149,6 +149,9 @@ const getProducts = async (req, res) => {
         const type = req.query.type == 'ceramic' ? 'Ceramic' : req.query.type == 'metal' ? 'Metal' : '';
 
 
+        // const regexPattern = searchString
+        //     .replace(/[o0]/g, '[o0]')
+        //     .replace(/\s/g, '\\s*');
 
         const pattern = searchString
             .split('')
@@ -161,11 +164,9 @@ const getProducts = async (req, res) => {
                     return char;
                 }
             })
-            .join('[\\s-]*');
-        const regexPattern = `^.*${pattern}.*$`;
-        // const regexPattern = searchString
-        //     .replace(/[o0]/g, '[o0]')
-        //     .replace(/\s/g, '\\s*');
+            .join('[\\s\\n-]*');
+
+        const regexPattern = `.*${pattern}.*`;
 
         const searchFilter = {
             $or: [
