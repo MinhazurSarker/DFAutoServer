@@ -206,7 +206,8 @@ const getProducts = async (req, res) => {
                 return char;
             }
         })
-        .join('');
+        // .join('[-\\s]*');
+        .join('[ -]*');
     const regexPattern = `^.*${pattern}.*$`;
     const match = {
         $or: [
