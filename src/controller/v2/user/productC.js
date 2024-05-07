@@ -194,7 +194,7 @@ const getProducts = async (req, res) => {
 
     // const pattern2 = searchString
     //     .replace(/[o0]/g, '[o0]')
-    //     .replace(/\s/g, '\\s*');
+    //     .replace(/\s/g, '[\\s\\n-]*');
 
     const pattern = searchString
         .split('')
@@ -202,13 +202,13 @@ const getProducts = async (req, res) => {
             if (char.toLowerCase() === 'o' || char === '0') {
                 return '[o0]';
             } else if (char === ' ') {
-                return '\\s*';
+                return '[\\s\\n-]*';
+                // return '\\s*';
             } else {
                 return char;
             }
         })
         .join('[\\s\\n-]*');
-
     const regexPattern = `.*${pattern}.*`;
     // const regexPattern = `^.*${pattern}.*$`;
 

@@ -159,13 +159,13 @@ const getProducts = async (req, res) => {
                 if (char.toLowerCase() === 'o' || char === '0') {
                     return '[o0]';
                 } else if (char === ' ') {
-                    return '\\s*';
+                    return '[\\s\\n-]*';
+                    // return '\\s*';
                 } else {
                     return char;
                 }
             })
             .join('[\\s\\n-]*');
-
         const regexPattern = `.*${pattern}.*`;
 
         const searchFilter = {
