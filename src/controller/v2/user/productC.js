@@ -206,7 +206,7 @@ const getProducts = async (req, res) => {
                 return char;
             }
         })
-        .join('[-\\s]*');
+        .join('[\\s-]*');
 
     const regexPattern = `^.*${pattern}.*$`;
     const match = {
