@@ -6,7 +6,7 @@ const stripeInstance = require('../services/stripeS');
 
 const userCheck = async () => {
     try {
-        const users = await User.find({ subEnd: { $lte: Date.now() }, role: { $ne: 'user' }, infinity: { $ne: true } })
+        const users = await User.find({ subEnd: { $lte: Date.now().valueOf() }, role: { $ne: 'user' }, infinity: { $ne: true } })
         users.forEach(async (user) => {
             if (user.autoRenew == true && user.stripeCustomerId !== '' && user.stripeCustomerId !== null && user.stripeCustomerId !== undefined) {
                 const plan = await Plan.findOne({ _id: user?.currentPlan })
